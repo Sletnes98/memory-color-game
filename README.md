@@ -57,3 +57,19 @@ Hvis en spiller trykker feil farge eller feil rekkefølge, avsluttes spillet og 
 
 ## Status
 Prosjektet er i oppstartsfasen. Repository inneholder foreløpig dokumentasjon og grunnoppsett.
+
+## API-oversikt
+
+Dette prosjektet inneholder et REST-lignende API for Memory Color Game.
+API-et brukes av klienten til å opprette spill og lagre gjeldende spilltilstand.
+
+API-et er ment å brukes av en klientapplikasjon.
+
+Endepunkter som er planlagt (scaffold):
+
+- Opprette et nytt spill
+- Hente spillstatus
+- Sende trekk i et spill
+
+API-et er dokumentert og kan testes ved hjelp av Bruno.
+Bruno-samlingen ligger i mappen `api-tests/`.
