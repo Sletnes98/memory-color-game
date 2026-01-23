@@ -73,3 +73,5 @@ Endepunkter som er planlagt (scaffold):
 
 API-et er dokumentert og kan testes ved hjelp av Bruno.
 Bruno-samlingen ligger i mappen `api-tests/`.
+
+Merk: API-et er foreløpig bare scaffold (planlagt struktur) og er ikke fullt implementert enda.
