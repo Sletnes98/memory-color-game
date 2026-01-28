@@ -76,13 +76,24 @@ Bruno-samlingen ligger i mappen `api-tests/`.
 
 Merk: API-et er foreløpig bare scaffold (planlagt struktur) og er ikke fullt implementert enda.
 
-## Users and Consent
+## Brukere og samtykke
 
-The application supports basic user management through the API.
+Applikasjonen støtter enkel håndtering av brukere gjennom API-et.
 
-- Users are created via `POST /users`
-- Active consent to Terms of Service and Privacy Policy is required
-- Users can be deleted via `DELETE /users/:id`
-- User data is minimized and stored in memory only
+- Brukere opprettes via `POST /users`
+- Aktivt samtykke til brukervilkår (Terms of Service) og personvernerklæring (Privacy Policy) er påkrevd ved opprettelse
+- Brukere kan trekke tilbake samtykke og slette kontoen sin via `DELETE /users/:id`
+- Brukerdata er minimert i tråd med GDPR-prinsipper og lagres kun midlertidig i minne (ingen database)
 
-See `PRIVACY.md` and `TERMS.md` for more information.
+Se `PRIVACY.md` og `TERMS.md` for mer informasjon.
+
+## Kjøre serveren lokalt
+
+Backend-serveren ligger i mappen `server/`.
+
+For å starte serveren lokalt:
+
+```bash
+cd server
+npm install
+node src/app.js
