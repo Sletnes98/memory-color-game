@@ -75,3 +75,14 @@ API-et er dokumentert og kan testes ved hjelp av Bruno.
 Bruno-samlingen ligger i mappen `api-tests/`.
 
 Merk: API-et er foreløpig bare scaffold (planlagt struktur) og er ikke fullt implementert enda.
+
+## Users and Consent
+
+The application supports basic user management through the API.
+
+- Users are created via `POST /users`
+- Active consent to Terms of Service and Privacy Policy is required
+- Users can be deleted via `DELETE /users/:id`
+- User data is minimized and stored in memory only
+
+See `PRIVACY.md` and `TERMS.md` for more information.
