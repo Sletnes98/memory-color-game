@@ -97,3 +97,9 @@ For å starte serveren lokalt:
 cd server
 npm install
 node src/app.js
+```
+
+## Prosjektoversikt
+
+En oversikt over prosjektets mål, status og videre plan finnes i  
+`docs/PROJECT.md`.
