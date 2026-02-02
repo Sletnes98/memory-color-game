@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 
 const usersRouter = require("./routes/users");
+const gamesRouter = require("./routes/games");
+
 
 const PORT = 3000;
 
@@ -14,6 +16,8 @@ app.get("/health", (req, res) => {
 
 // User routes
 app.use("/users", usersRouter);
+app.use("/games", gamesRouter);
+
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
