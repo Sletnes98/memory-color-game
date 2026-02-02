@@ -10,7 +10,8 @@ router.post("/", (req, res) => {
   const { displayName, consent } = req.body;
 
   // Litt basic sjekk så vi ikke får tomme/rare brukere
-  if (!displayName) {
+  const cleanName = (displayName || "").trim();
+  if (!cleanName) {
     return res.status(400).json({
       error: "displayName is required"
     });
@@ -28,7 +29,7 @@ router.post("/", (req, res) => {
 
   const user = {
     id,
-    displayName,
+    displayName: cleanName,
     createdAt: now,
 
     // Jeg lagrer bare tidspunkt (dataminimering),
