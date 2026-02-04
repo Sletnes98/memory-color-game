@@ -28,6 +28,12 @@ for hver runde. Prosjektet utvikles som et semesterprosjekt i Apputvikling 2.
 - Opprette og slette brukere via API
 - Kreve aktivt samtykke til ToS og Privacy Policy
 
+### Milepæl 2.5: Klientgrunnlag (ferdig)
+- Klient scaffold med index.html, app.mjs og app.css
+- Custom web component for brukerhåndtering
+- Klienten kommuniserer med API via én sentral fetch-funksjon
+- Grunnleggende arkitektur med skille mellom UI, logikk og data
+
 ### Milepæl 3: Spillflyt (neste)
 - Opprette spill
 - Oppdatere spillstatus
@@ -43,3 +49,4 @@ for hver runde. Prosjektet utvikles som et semesterprosjekt i Apputvikling 2.
 - Fokus på enkel struktur først
 - Utvide funksjonalitet gradvis
 - Bruke Bruno til testing av API
+
