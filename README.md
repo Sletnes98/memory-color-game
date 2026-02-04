@@ -99,6 +99,17 @@ npm install
 node src/app.js
 ```
 
+## Klient (UI)
+
+Klienten er bygget som et enkelt statisk frontend-grensesnitt servert via Express.
+Arkitekturen er delt i tre lag:
+
+- Data: Én felles `api()`-funksjon for all kommunikasjon med backend
+- Logikk: `UserService` håndterer brukerrelaterte operasjoner
+- UI: Et custom web component (`<user-panel>`) for brukerhåndtering
+
+Klienten bruker kun relative URL-er og har ett sentralt fetch-punkt.
+
 ## Prosjektoversikt
 
 En oversikt over prosjektets mål, status og videre plan finnes i  
