@@ -12,8 +12,14 @@ async function api(path, { method = "GET", body } = {}) {
   if (res.status === 204) return { ok: true, status: 204, data: null };
 
   const data = await res.json().catch(() => null);
+
   if (!res.ok) {
-    const msg = data?.error?.message || data?.error || `HTTP ${res.status}`;
+    // Støtter både: { error: "..." } og { error: { message: "..." } }
+    const msg =
+      (typeof data?.error === "string" && data.error) ||
+      data?.error?.message ||
+      data?.message ||
+      `HTTP ${res.status}`;
     throw new Error(msg);
   }
 
@@ -89,14 +95,16 @@ class UserPanel extends HTMLElement {
         <label>
           User ID
           <input id="userId" type="text" placeholder="lim inn id her" value="${this.state.lastUserId}" />
-          <small>Opprett bruker for å få ID.</small>
+          <small>Tips: Opprett bruker først, så lagres ID her automatisk.</small>
         </label>
       </section>
+
+      <pre id="debug" class="debug"></pre>
     `;
   }
 
   wire() {
-    const $ = (id) => this.querySelector(id);
+    const $ = (sel) => this.querySelector(sel);
 
     const displayNameEl = $("#displayName");
     const termsEl = $("#terms");
@@ -128,6 +136,8 @@ class UserPanel extends HTMLElement {
     $("#getBtn").addEventListener("click", async () => {
       try {
         const id = userIdEl.value.trim();
+        if (!id) return this.updateDebug({ error: "Lim inn en User ID først." });
+
         const result = await UserService.getUser(id);
         this.updateDebug(result.data);
       } catch (err) {
@@ -138,7 +148,13 @@ class UserPanel extends HTMLElement {
     $("#deleteBtn").addEventListener("click", async () => {
       try {
         const id = userIdEl.value.trim();
+        if (!id) return this.updateDebug({ error: "Lim inn en User ID først." });
+
         await UserService.deleteUser(id);
+
+        // rydde lokalt
+        userIdEl.value = "";
+        localStorage.removeItem("lastUserId");
 
         this.updateDebug({ ok: true, deleted: id });
       } catch (err) {
@@ -148,8 +164,11 @@ class UserPanel extends HTMLElement {
   }
 
   updateDebug(obj) {
-    const pre = document.querySelector("#debug");
-    pre.textContent = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
+    const pre = this.querySelector("#debug");
+    if (!pre) return;
+
+    pre.textContent =
+      typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
   }
 }
 
