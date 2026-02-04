@@ -1,13 +1,14 @@
 const express = require("express");
 const app = express();
 
+app.use(express.json());
+app.use(express.static("../client"));
+
 const usersRouter = require("./routes/users");
 const gamesRouter = require("./routes/games");
 
 
 const PORT = 3000;
-
-app.use(express.json());
 
 // Health check
 app.get("/health", (req, res) => {
