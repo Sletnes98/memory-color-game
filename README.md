@@ -121,7 +121,7 @@ All nettverkskommunikasjon går gjennom én funksjon i `client/data/api.mjs`.
 Klienten bruker kun relative URL-er (f.eks. `/users/:id`).
 Web componentet `user-panel` håndterer oppretting, henting, oppdatering og sletting av brukere.
 
-## Huskeregel – hvordan prosjektet henger sammen (for meg selv)
+# Huskeregel – hvordan prosjektet henger sammen (for meg selv)
 
 Prosjektet er delt i klient, server og tester, med tydelige roller.
 
@@ -132,7 +132,7 @@ Overordnet flyt
 	4.	Serveren håndterer logikk og data i minnet
 	5.	Bruno brukes til å teste API-et direkte
 
-# Klient (client/)
+## Klient (client/)
 
 Klienten er delt i tre lag for oversikt og enkel videreutvikling:
 
@@ -156,7 +156,7 @@ Inneholder userService.mjs, som beskriver hva som kan gjøres
 Inneholder api.mjs, som er den eneste plassen fetch() brukes.
 All kommunikasjon med API-et går via denne filen.
 
-# Server (server/)
+## Server (server/)
 
 Serveren er bygget med Express og er også delt i lag:
 
@@ -171,7 +171,7 @@ server/
 	        Servering av klient-filer
 	•	Ingen database brukes ennå – data lagres i minnet for enkelhet.
 
-# API-tester (api-tests/)
+## API-tester (api-tests/)
 
 Bruno brukes til å teste API-et uavhengig av klienten:
 	•	Opprette bruker
@@ -181,7 +181,7 @@ Bruno brukes til å teste API-et uavhengig av klienten:
 
 Dette gjør det enkelt å verifisere at API-et fungerer korrekt.
 
-# Dokumentasjon
+## Dokumentasjon
 
 	•	README.md – Kort oversikt og hvordan kjøre prosjektet
 	•	docs/PROJECT.md – Milepæler og prosjektstatus
