@@ -121,7 +121,7 @@ All nettverkskommunikasjon går gjennom én funksjon i `client/data/api.mjs`.
 Klienten bruker kun relative URL-er (f.eks. `/users/:id`).
 Web componentet `user-panel` håndterer oppretting, henting, oppdatering og sletting av brukere.
 
-## Hvordan prosjektet henger sammen (kort forklaring)
+## Huskeregel – hvordan prosjektet henger sammen (for meg selv)
 
 Prosjektet er delt i klient, server og tester, med tydelige roller.
 
