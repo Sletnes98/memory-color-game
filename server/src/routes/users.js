@@ -56,6 +56,33 @@ router.get("/:id", (req, res) => {
 });
 
 // ---------------------
+// Oppdatere bruker (kun displayName)
+// ---------------------
+router.put("/:id", (req, res) => {
+  const { id } = req.params;
+
+  if (!users.has(id)) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  const { displayName } = req.body;
+
+  if (!displayName || typeof displayName !== "string") {
+    return res.status(400).json({ error: "displayName is required" });
+  }
+
+  const user = users.get(id);
+  const updated = {
+    ...user,
+    displayName: displayName.trim(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  users.set(id, updated);
+  res.json(updated);
+});
+
+// ---------------------
 // Slette bruker
 // ---------------------
 router.delete("/:id", (req, res) => {

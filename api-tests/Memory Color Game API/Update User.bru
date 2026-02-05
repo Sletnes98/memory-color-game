@@ -1,13 +1,19 @@
 meta {
-  name: Get User
+  name: Update User
   type: http
-  seq: 5
+  seq: 7
 }
 
-get {
+put {
   url: http://localhost:3000/users/b22e27a5-e343-46a3-8b5e-c276ee230dec
-  body: none
+  body: json
   auth: inherit
+}
+
+body:json {
+  {
+    "displayName": "NyttNavn 2"
+  }
 }
 
 settings {

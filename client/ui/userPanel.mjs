@@ -34,6 +34,7 @@ class UserPanel extends HTMLElement {
         <div class="row">
           <button id="createBtn">Opprett bruker</button>
           <button id="getBtn">Hent bruker</button>
+          <button id="updateBtn">Oppdater bruker</button>
           <button id="deleteBtn">Slett bruker</button>
         </div>
 
@@ -86,10 +87,26 @@ class UserPanel extends HTMLElement {
       }
     });
 
+    $("#updateBtn").addEventListener("click", async () => {
+      try {
+        const id = userIdEl.value.trim();
+        const displayName = displayNameEl.value.trim();
+
+        const result = await UserService.updateUser(id, displayName);
+        this.updateDebug(result.data);
+      } catch (err) {
+        this.updateDebug({ error: err.message });
+      }
+    });
+
     $("#deleteBtn").addEventListener("click", async () => {
       try {
         const id = userIdEl.value.trim();
         await UserService.deleteUser(id);
+
+        // Rydde opp lokalt etter sletting
+        userIdEl.value = "";
+        localStorage.removeItem("lastUserId");
 
         this.updateDebug({ ok: true, deleted: id });
       } catch (err) {

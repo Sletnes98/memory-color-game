@@ -21,4 +21,11 @@ export const UserService = {
   async deleteUser(id) {
     return api(`/users/${id}`, { method: "DELETE" });
   },
+
+  async updateUser(id, displayName) {
+  return api(`/users/${id}`, {
+    method: "PUT",
+    body: { displayName }
+  });
+}
 };

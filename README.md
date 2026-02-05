@@ -114,3 +114,9 @@ Klienten bruker kun relative URL-er og har ett sentralt fetch-punkt.
 
 En oversikt over prosjektets mål, status og videre plan finnes i  
 `docs/PROJECT.md`.
+
+## Klientstruktur (UI/Logic/Data)
+Klienten er delt i `ui/`, `logic/` og `data/` for å holde ansvar separat.
+All nettverkskommunikasjon går gjennom én funksjon i `client/data/api.mjs`.
+Klienten bruker kun relative URL-er (f.eks. `/users/:id`).
+Web componentet `user-panel` håndterer oppretting, henting, oppdatering og sletting av brukere.
