@@ -120,3 +120,70 @@ Klienten er delt i `ui/`, `logic/` og `data/` for å holde ansvar separat.
 All nettverkskommunikasjon går gjennom én funksjon i `client/data/api.mjs`.
 Klienten bruker kun relative URL-er (f.eks. `/users/:id`).
 Web componentet `user-panel` håndterer oppretting, henting, oppdatering og sletting av brukere.
+
+## Hvordan prosjektet henger sammen (kort forklaring)
+
+Prosjektet er delt i klient, server og tester, med tydelige roller.
+
+Overordnet flyt
+	1.	Brukeren åpner nettsiden i nettleseren (localhost:3000)
+	2.	Serveren sender klient-filene (HTML, CSS, JS)
+	3.	Klienten kommuniserer med API-et via fetch
+	4.	Serveren håndterer logikk og data i minnet
+	5.	Bruno brukes til å teste API-et direkte
+
+# Klient (client/)
+
+Klienten er delt i tre lag for oversikt og enkel videreutvikling:
+
+client/
+├─ ui/        → Web Components (UI og brukerinteraksjon)
+├─ logic/     → Applikasjonslogikk (hva som skal skje)
+├─ data/      → API-klient (én felles fetch-funksjon)
+
+	•	ui/
+
+Inneholder userPanel.mjs, som definerer et custom HTML-element
+(<user-panel>). Dette håndterer knapper, input og visning.
+	
+    •	logic/
+
+Inneholder userService.mjs, som beskriver hva som kan gjøres
+(opprette, hente, oppdatere og slette bruker).
+	
+    •	data/
+
+Inneholder api.mjs, som er den eneste plassen fetch() brukes.
+All kommunikasjon med API-et går via denne filen.
+
+# Server (server/)
+
+Serveren er bygget med Express og er også delt i lag:
+
+server/
+├─ src/
+│  ├─ app.js      → Starter serveren og kobler alt sammen
+│  ├─ routes/     → API-endepunkter (users, games)
+│  └─ data/       → Midlertidig lagring i minnet (Map)
+
+	•	Serveren håndterer både:
+	        API-endepunkter (/users, /games)
+	        Servering av klient-filer
+	•	Ingen database brukes ennå – data lagres i minnet for enkelhet.
+
+# API-tester (api-tests/)
+
+Bruno brukes til å teste API-et uavhengig av klienten:
+	•	Opprette bruker
+	•	Hente bruker
+	•	Oppdatere bruker
+	•	Slette bruker
+
+Dette gjør det enkelt å verifisere at API-et fungerer korrekt.
+
+# Dokumentasjon
+
+	•	README.md – Kort oversikt og hvordan kjøre prosjektet
+	•	docs/PROJECT.md – Milepæler og prosjektstatus
+	•	PRIVACY.md og TERMS.md – Samtykke og vilkår
+
