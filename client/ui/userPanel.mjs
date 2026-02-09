@@ -12,40 +12,14 @@ class UserPanel extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
-      <section class="card">
-        <h2>Bruker</h2>
+  const template = document.getElementById("user-panel-template");
+  const clone = template.content.cloneNode(true);
+  this.appendChild(clone);
 
-        <label>
-          Visningsnavn
-          <input id="displayName" type="text" placeholder="f.eks. Testbruker" />
-        </label>
-
-        <label>
-          <input id="terms" type="checkbox" />
-          Jeg godtar vilkårene (ToS)
-        </label>
-
-        <label>
-          <input id="privacy" type="checkbox" />
-          Jeg godtar personvern (Privacy Policy)
-        </label>
-
-        <div class="row">
-          <button id="createBtn">Opprett bruker</button>
-          <button id="getBtn">Hent bruker</button>
-          <button id="updateBtn">Oppdater bruker</button>
-          <button id="deleteBtn">Slett bruker</button>
-        </div>
-
-        <label>
-          User ID
-          <input id="userId" type="text" placeholder="lim inn id her" value="${this.state.lastUserId}" />
-          <small>Opprett bruker for å få ID.</small>
-        </label>
-      </section>
-    `;
-  }
+  // sett default verdi etterpå
+  const userIdEl = this.querySelector("#userId");
+  userIdEl.value = this.state.lastUserId;
+}
 
   wire() {
     const $ = (sel) => this.querySelector(sel);
