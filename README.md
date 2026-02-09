@@ -93,12 +93,23 @@ Backend-serveren ligger i mappen `server/`.
 
 For å starte serveren lokalt:
 
+(Første gang)
+
 ```bash
+
 cd server
 npm install
 node src/app.js
-```
 
+```
+(Alle andre ganger)
+
+```bash
+
+cd server
+node src/app.js
+
+```
 ## Klient (UI)
 
 Klienten er bygget som et enkelt statisk frontend-grensesnitt servert via Express.
