@@ -90,7 +90,7 @@ class UserPanel extends HTMLElement {
   }
 
   updateDebug(obj) {
-    const pre = document.querySelector("#debug");
+    const pre = this.querySelector("#debug");
     pre.textContent =
       typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
   }

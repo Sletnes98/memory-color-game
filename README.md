@@ -132,6 +132,16 @@ All nettverkskommunikasjon går gjennom én funksjon i `client/data/api.mjs`.
 Klienten bruker kun relative URL-er (f.eks. `/users/:id`).
 Web componentet `user-panel` håndterer oppretting, henting, oppdatering og sletting av brukere.
 
+## Backend-struktur
+
+Backend er delt i tre lag:
+
+- **routes/** – håndterer HTTP (req/res)
+- **services/** – inneholder domene-logikk og validering
+- **data/** – enkel lagring (Map, uten database)
+
+Routes er tynne og kaller service-layer for all forretningslogikk.
+
 # Huskeregel – hvordan prosjektet henger sammen (for meg selv)
 
 Prosjektet er delt i klient, server og tester, med tydelige roller.
