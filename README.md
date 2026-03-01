@@ -83,7 +83,7 @@ Applikasjonen støtter enkel håndtering av brukere gjennom API-et.
 - Brukere opprettes via `POST /users`
 - Aktivt samtykke til brukervilkår (Terms of Service) og personvernerklæring (Privacy Policy) er påkrevd ved opprettelse
 - Brukere kan trekke tilbake samtykke og slette kontoen sin via `DELETE /users/:id`
-- Brukerdata er minimert i tråd med GDPR-prinsipper og lagres kun midlertidig i minne (ingen database)
+- Brukerdata lagres i PostgreSQL i tråd med prinsippet om dataminimering
 
 Se `PRIVACY.md` og `TERMS.md` for mer informasjon.
 
@@ -138,7 +138,7 @@ Backend er delt i tre lag:
 
 - **routes/** – håndterer HTTP (req/res)
 - **services/** – inneholder domene-logikk og validering
-- **data/** – enkel lagring (Map, uten database)
+- **data/** – database-tilgang (PostgreSQL via Render)
 
 Routes er tynne og kaller service-layer for all forretningslogikk.
 
@@ -185,12 +185,13 @@ server/
 ├─ src/
 │  ├─ app.js      → Starter serveren og kobler alt sammen
 │  ├─ routes/     → API-endepunkter (users, games)
-│  └─ data/       → Midlertidig lagring i minnet (Map)
+│  └─ data/       → Database-tilgang (PostgreSQL)
 
 	•	Serveren håndterer både:
 	        API-endepunkter (/users, /games)
 	        Servering av klient-filer
-	•	Ingen database brukes ennå – data lagres i minnet for enkelhet.
+			Data lagres i PostgreSQL via Render
+
 
 ## API-tester (api-tests/)
 
@@ -208,3 +209,10 @@ Dette gjør det enkelt å verifisere at API-et fungerer korrekt.
 	•	docs/PROJECT.md – Milepæler og prosjektstatus
 	•	PRIVACY.md og TERMS.md – Samtykke og vilkår
 
+## Database (PostgreSQL – Render)
+
+Prosjektet bruker en eksternt hostet PostgreSQL-database via Render (free tier).
+
+Oppretting av bruker (Client → API → DB) resulterer i en ny rad i databasen.
+
+Data overlever server-restart.
