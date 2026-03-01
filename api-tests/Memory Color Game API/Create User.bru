@@ -5,14 +5,14 @@ meta {
 }
 
 post {
-  url: http://localhost:3000/users
+  url: {{BASE_URL}}/users/
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "displayName": "OleDole",
+    "displayName": "TestinTesting",
     "consent": {
       "acceptedTerms": true,
       "acceptedPrivacy": true

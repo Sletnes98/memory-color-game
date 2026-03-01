@@ -58,6 +58,12 @@ Hvis en spiller trykker feil farge eller feil rekkefølge, avsluttes spillet og 
 ## Status
 Prosjektet er i oppstartsfasen. Repository inneholder foreløpig dokumentasjon og grunnoppsett.
 
+## Live Web Service
+
+Applikasjonen er deployet på Render:
+
+https://memory-color-game.onrender.com
+
 ## API-oversikt
 
 Dette prosjektet inneholder et REST-lignende API for Memory Color Game.
@@ -211,8 +217,6 @@ Dette gjør det enkelt å verifisere at API-et fungerer korrekt.
 
 ## Database (PostgreSQL – Render)
 
-Prosjektet bruker en eksternt hostet PostgreSQL-database via Render (free tier).
-
-Oppretting av bruker (Client → API → DB) resulterer i en ny rad i databasen.
-
+Prosjektet bruker en ekstern PostgreSQL-database hostet på Render.
+Opprettelse av bruker (Client → API → DB) resulterer i en ny rad i databasen.
 Data overlever server-restart.
