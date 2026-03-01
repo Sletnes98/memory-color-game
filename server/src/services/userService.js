@@ -1,4 +1,4 @@
-const { users } = require("../data/users");
+const pool = require("../db");
 const crypto = require("crypto");
 
 function requireDisplayName(displayName) {
@@ -9,56 +9,46 @@ function requireDisplayName(displayName) {
   }
 }
 
-function requireConsent(consent) {
-  if (!consent?.acceptedTerms || !consent?.acceptedPrivacy) {
-    const err = new Error("Consent to Terms and Privacy Policy is required");
-    err.status = 400;
-    throw err;
-  }
-}
-
-function createUser({ displayName, consent }) {
+async function createUser({ displayName, acceptedTermsAt, acceptedPrivacyAt }) {
   requireDisplayName(displayName);
-  requireConsent(consent);
 
   const id = crypto.randomUUID();
-  const now = new Date().toISOString();
 
-  const user = {
-    id,
-    displayName: displayName.trim(),
-    createdAt: now,
-    acceptedTermsAt: now,
-    acceptedPrivacyAt: now,
-  };
+  const result = await pool.query(
+    `
+    INSERT INTO users (id, display_name, accepted_terms_at, accepted_privacy_at)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *;
+    `,
+    [id, displayName.trim(), acceptedTermsAt, acceptedPrivacyAt]
+  );
 
-  users.set(id, user);
-  return user;
+  return result.rows[0];
 }
 
-function getUser(id) {
-  const user = users.get(id);
-  if (!user) {
-    const err = new Error("User not found");
-    err.status = 404;
-    throw err;
-  }
-  return user;
+async function getUser(id) {
+  const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
+  return result.rows[0] || null;
 }
 
-function updateUser(id, { displayName }) {
-  const user = getUser(id);
+async function updateUser(id, displayName) {
   requireDisplayName(displayName);
 
-  const updated = { ...user, displayName: displayName.trim() };
-  users.set(id, updated);
-  return updated;
+  const result = await pool.query(
+    `
+    UPDATE users
+    SET display_name = $1
+    WHERE id = $2
+    RETURNING *;
+    `,
+    [displayName.trim(), id]
+  );
+
+  return result.rows[0] || null;
 }
 
-function deleteUser(id) {
-  // bruker getUser for å få 404 hvis den ikke finnes
-  getUser(id);
-  users.delete(id);
+async function deleteUser(id) {
+  await pool.query(`DELETE FROM users WHERE id = $1`, [id]);
 }
 
 module.exports = {

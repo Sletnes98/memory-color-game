@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 
@@ -36,7 +37,34 @@ app.get("/privacy", (req, res) => {
   res.type("text/plain").send(content);
 });
 
+const pool = require("./db");
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+async function initDb() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id uuid PRIMARY KEY,
+      display_name text NOT NULL,
+      created_at timestamptz NOT NULL DEFAULT now(),
+      accepted_terms_at timestamptz NOT NULL,
+      accepted_privacy_at timestamptz NOT NULL
+    );
+  `);
+
+  console.log("Users table ready");
+}
+
+app.get("/db-test", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW() as now");
+    res.json({ ok: true, now: result.rows[0].now });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+
+initDb().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
 });
