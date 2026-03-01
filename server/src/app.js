@@ -1,44 +1,54 @@
 require("dotenv").config();
+
 const express = require("express");
+const path = require("path");
+const fs = require("fs");
+
 const app = express();
 
 app.use(express.json());
-app.use(express.static("../client"));
+app.use(express.static(path.join(__dirname, "../../client")));
 
 const usersRouter = require("./routes/users");
 const gamesRouter = require("./routes/games");
+const pool = require("./db");
 
+const PORT = process.env.PORT || 3000;
 
-const PORT = 3000;
-
-// Health check
+/* -----------------------
+   Health check
+----------------------- */
 app.get("/health", (req, res) => {
   res.json({ ok: true });
 });
 
-// User routes
+/* -----------------------
+   Routes
+----------------------- */
 app.use("/users", usersRouter);
 app.use("/games", gamesRouter);
 
-const fs = require("fs");
-const path = require("path");
-
-// Terms of Service
+/* -----------------------
+   Terms of Service
+----------------------- */
 app.get("/terms", (req, res) => {
   const filePath = path.join(__dirname, "../../TERMS.md");
   const content = fs.readFileSync(filePath, "utf-8");
   res.type("text/plain").send(content);
 });
 
-// Privacy Policy
+/* -----------------------
+   Privacy Policy
+----------------------- */
 app.get("/privacy", (req, res) => {
   const filePath = path.join(__dirname, "../../PRIVACY.md");
   const content = fs.readFileSync(filePath, "utf-8");
   res.type("text/plain").send(content);
 });
 
-const pool = require("./db");
-
+/* -----------------------
+   Database init
+----------------------- */
 async function initDb() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -53,6 +63,9 @@ async function initDb() {
   console.log("Users table ready");
 }
 
+/* -----------------------
+   DB test endpoint
+----------------------- */
 app.get("/db-test", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW() as now");
@@ -62,9 +75,16 @@ app.get("/db-test", async (req, res) => {
   }
 });
 
-
-initDb().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+/* -----------------------
+   Start server
+----------------------- */
+initDb()
+  .then(() => {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to initialize database:", err);
+    process.exit(1);
   });
-});
