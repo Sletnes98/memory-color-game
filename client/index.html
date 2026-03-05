@@ -1,49 +1,68 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Memory Color Game</title>
+    <title data-i18n="app.title"></title>
+
     <link rel="stylesheet" href="./app.css" />
     <script type="module" src="./app.mjs"></script>
   </head>
+
   <body>
     <main>
-      <h1>Memory Color Game</h1>
+      <h1 data-i18n="app.title"></h1>
+
       <template id="user-panel-template">
-  <section class="card">
-    <h2>Bruker</h2>
+        <section class="card">
 
-    <label>
-      Visningsnavn
-      <input id="displayName" type="text" placeholder="f.eks. Testbruker" />
-    </label>
+          <h2 data-i18n="user.sectionTitle"></h2>
 
-    <label>
-      <input id="terms" type="checkbox" />
-      Jeg godtar <a href="/terms" target="_blank" rel="noopener">vilkårene (ToS)</a>
-    </label>
+          <label>
+            <span data-i18n="user.displayName.label"></span>
+            <input
+              id="displayName"
+              type="text"
+              data-i18n-attr="placeholder:input.displayName.placeholder"
+            />
+          </label>
 
-<label>
-  <input id="privacy" type="checkbox" />
-  Jeg godtar <a href="/privacy" target="_blank" rel="noopener">personvern (Privacy Policy)</a>
-</label>
+          <label>
+            <input id="terms" type="checkbox" />
+            <span data-i18n="user.acceptTerms"></span>
+            <a href="/terms" target="_blank" rel="noopener" data-i18n="link.terms"></a>
+          </label>
 
-    <div class="row">
-      <button id="createBtn">Opprett bruker</button>
-      <button id="getBtn">Hent bruker</button>
-      <button id="updateBtn">Oppdater bruker</button>
-      <button id="deleteBtn">Slett bruker</button>
-    </div>
+          <label>
+            <input id="privacy" type="checkbox" />
+            <span data-i18n="user.acceptPrivacy"></span>
+            <a href="/privacy" target="_blank" rel="noopener" data-i18n="link.privacy"></a>
+          </label>
 
-    <label>
-      User ID
-      <input id="userId" type="text" placeholder="lim inn id her" />
-      <small>Opprett bruker for å få ID.</small>
-    </label>
-    <pre id="debug"></pre>
-  </section>
-</template>
+          <div class="row">
+            <button id="createBtn" data-i18n="user.create"></button>
+            <button id="getBtn" data-i18n="user.get"></button>
+            <button id="updateBtn" data-i18n="user.update"></button>
+            <button id="deleteBtn" data-i18n="user.delete"></button>
+          </div>
+
+          <label>
+            <span data-i18n="user.id.label"></span>
+
+            <input
+              id="userId"
+              type="text"
+              data-i18n-attr="placeholder:input.userId.placeholder"
+            />
+
+            <small data-i18n="user.help.createToGetId"></small>
+          </label>
+
+          <pre id="debug" data-i18n="debug.ready"></pre>
+
+        </section>
+      </template>
+
       <user-panel></user-panel>
     </main>
   </body>

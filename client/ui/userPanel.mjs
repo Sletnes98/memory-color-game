@@ -12,20 +12,17 @@ class UserPanel extends HTMLElement {
     this.updateDebug(t("debug.ready"));
   }
 
-  render() {
+render() {
+  this.innerHTML = "";
+
   const template = document.getElementById("user-panel-template");
   const clone = template.content.cloneNode(true);
+
   this.appendChild(clone);
 
-  // sett default verdi etterpå
   const userIdEl = this.querySelector("#userId");
   userIdEl.value = this.state.lastUserId;
-  this.querySelector("#createBtn").textContent = t("user.create");
-  this.querySelector("#getBtn").textContent = t("user.get");
-  this.querySelector("#updateBtn").textContent = t("user.update");
-  this.querySelector("#deleteBtn").textContent = t("user.delete");
 }
-
   wire() {
     const $ = (sel) => this.querySelector(sel);
 
@@ -102,3 +99,4 @@ class UserPanel extends HTMLElement {
 }
 
 customElements.define("user-panel", UserPanel);
+

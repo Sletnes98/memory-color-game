@@ -1,10 +1,26 @@
 {
   "app.title": "Memory Color Game",
 
+  "user.sectionTitle": "User",
+
+  "user.displayName.label": "Display name",
+  "input.displayName.placeholder": "e.g. Test user",
+
+  "user.acceptTerms": "I accept",
+  "link.terms": "Terms of Service",
+
+  "user.acceptPrivacy": "I accept",
+  "link.privacy": "Privacy Policy",
+
   "user.create": "Create user",
   "user.get": "Get user",
   "user.update": "Update user",
   "user.delete": "Delete user",
+
+  "user.id.label": "User ID",
+  "input.userId.placeholder": "paste id here",
+
+  "user.help.createToGetId": "Create user to get ID.",
 
   "debug.ready": "Ready.",
 

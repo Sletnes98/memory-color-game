@@ -48,7 +48,6 @@ router.get("/:id", async (req, res) => {
 // Oppdatere bruker
 router.put("/:id", async (req, res) => {
   try {
-    // tillat enten { displayName: "..." } eller bare "..." hvis du vil
     const displayName = req.body?.displayName ?? req.body;
 
     const user = await UserService.updateUser(req.params.id, displayName);

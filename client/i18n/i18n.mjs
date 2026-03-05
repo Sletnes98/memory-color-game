@@ -3,12 +3,7 @@ let lang = "en";
 
 function detectLang() {
   const l = (navigator.languages?.[0] || navigator.language || "en").toLowerCase();
-
-  if (l.startsWith("nb") || l.startsWith("no")) {
-    return "nb";
-  }
-
-  return "en";
+  return l.startsWith("nb") || l.startsWith("no") ? "nb" : "en";
 }
 
 export async function initI18n() {
@@ -21,7 +16,20 @@ export async function initI18n() {
 }
 
 export function t(key) {
-  return dict[key] || key;
+  return dict?.[key] ?? key;
+}
+
+export function translatePage(root = document) {
+
+  root.querySelectorAll("[data-i18n]").forEach(el =>
+    el.textContent = t(el.dataset.i18n)
+  );
+
+  root.querySelectorAll("[data-i18n-attr]").forEach(el => {
+    const [attr, key] = el.dataset.i18nAttr.split(":");
+    el.setAttribute(attr, t(key));
+  });
+
 }
 
 export function getLang() {

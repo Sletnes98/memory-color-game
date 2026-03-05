@@ -10,11 +10,15 @@ post {
   auth: inherit
 }
 
+headers {
+  Accept-Language: nb
+}
+
 body:json {
   {
     "displayName": "TestinTesting",
     "consent": {
-      "acceptedTerms": true,
+      "acceptedTerms": false,
       "acceptedPrivacy": true
     }
   }

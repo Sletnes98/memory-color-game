@@ -1,10 +1,26 @@
 {
-  "app.title": "Memory Color Game",
+  "app.title": "Memory Fargespill",
+
+  "user.sectionTitle": "Bruker",
+
+  "user.displayName.label": "Visningsnavn",
+  "input.displayName.placeholder": "f.eks. Testbruker",
+
+  "user.acceptTerms": "Jeg godtar",
+  "link.terms": "Vilkårene",
+
+  "user.acceptPrivacy": "Jeg godtar",
+  "link.privacy": "Personvern",
 
   "user.create": "Opprett bruker",
   "user.get": "Hent bruker",
   "user.update": "Oppdater bruker",
   "user.delete": "Slett bruker",
+
+  "user.id.label": "Bruker ID",
+  "input.userId.placeholder": "lim inn id her",
+
+  "user.help.createToGetId": "Opprett bruker for å få ID.",
 
   "debug.ready": "Klar.",
 
