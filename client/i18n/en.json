@@ -1,0 +1,13 @@
+{
+  "app.title": "Memory Color Game",
+
+  "user.create": "Create user",
+  "user.get": "Get user",
+  "user.update": "Update user",
+  "user.delete": "Delete user",
+
+  "debug.ready": "Ready.",
+
+  "error.offline": "You are offline. Try again later.",
+  "error.generic": "Something went wrong."
+}

@@ -1,3 +1,4 @@
+import { t } from "../i18n/i18n.mjs";
 import { UserService } from "../logic/userService.mjs";
 
 class UserPanel extends HTMLElement {
@@ -8,7 +9,7 @@ class UserPanel extends HTMLElement {
 
     this.render();
     this.wire();
-    this.updateDebug("Klar.");
+    this.updateDebug(t("debug.ready"));
   }
 
   render() {
@@ -19,6 +20,10 @@ class UserPanel extends HTMLElement {
   // sett default verdi etterpå
   const userIdEl = this.querySelector("#userId");
   userIdEl.value = this.state.lastUserId;
+  this.querySelector("#createBtn").textContent = t("user.create");
+  this.querySelector("#getBtn").textContent = t("user.get");
+  this.querySelector("#updateBtn").textContent = t("user.update");
+  this.querySelector("#deleteBtn").textContent = t("user.delete");
 }
 
   wire() {

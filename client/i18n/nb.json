@@ -1,0 +1,13 @@
+{
+  "app.title": "Memory Color Game",
+
+  "user.create": "Opprett bruker",
+  "user.get": "Hent bruker",
+  "user.update": "Oppdater bruker",
+  "user.delete": "Slett bruker",
+
+  "debug.ready": "Klar.",
+
+  "error.offline": "Du er offline. Prøv igjen senere.",
+  "error.generic": "Noe gikk galt."
+}
