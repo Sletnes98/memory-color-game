@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Memory Color Game</title>
+
+  <link rel="stylesheet" href="./app.css">
+  <link rel="stylesheet" href="./game/game.css">
+
+  <script type="module">
+    import "./game/gamePage.mjs";
+  </script>
+
+</head>
+
+<body>
+
+  <main>
+
+    <h1 style="text-align:center;">Memory Fargespill</h1>
+
+    <section class="game-board">
+
+      <button class="color-btn blue" data-color="blue" aria-label="Blue"></button>
+
+      <button class="color-btn red" data-color="red" aria-label="Red"></button>
+
+      <button class="color-btn green" data-color="green" aria-label="Green"></button>
+
+      <button class="color-btn yellow" data-color="yellow" aria-label="Yellow"></button>
+
+    </section>
+
+    <p class="status" id="status">
+      Waiting for game...
+    </p>
+
+  </main>
+
+</body>
+</ht
