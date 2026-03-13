@@ -1,0 +1,23 @@
+meta {
+  name: Wrong Color
+  type: http
+  seq: 11
+}
+
+post {
+  url: http://localhost:3000/games/a635eece-b54c-4eeb-8d8b-6ab21cffea15/move
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "playerId": "user-2",
+    "input": ["green", "blue", "yellow"]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

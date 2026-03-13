@@ -1,49 +1,72 @@
-// src/routes/games.js
 const express = require("express");
+const GameService = require("../services/gameService");
+
 const router = express.Router();
-const { games } = require("../data/games");
-const crypto = require("crypto");
 
-// ---------------------
-// GET /games
-// Returnerer alle spill (scaffold)
-// ---------------------
-router.get("/", (req, res) => {
-  res.json(Array.from(games.values()));
-});
+router.post("/", (req, res, next) => {
+  try {
+    const { player1Id } = req.body;
 
-// ---------------------
-// POST /games
-// Lager et nytt spill (scaffold)
-// ---------------------
-router.post("/", (req, res) => {
-  // Foreløpig: veldig enkelt spill-objekt
-  const id = crypto.randomUUID();
-  const now = new Date().toISOString();
+    if (!player1Id) {
+      const err = new Error("player1Id is required");
+      err.status = 400;
+      throw err;
+    }
 
-  const game = {
-    id,
-    createdAt: now,
-    status: "waiting" // typisk startstatus
-  };
+    const game = GameService.createGame(player1Id);
 
-  games.set(id, game);
-
-  res.status(201).json(game);
-});
-
-// ---------------------
-// GET /games/:id
-// Henter ett spill (scaffold)
-// ---------------------
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
-
-  if (!games.has(id)) {
-    return res.status(404).json({ error: "Game not found" });
+    res.status(201).json(game);
+  } catch (err) {
+    next(err);
   }
+});
 
-  res.json(games.get(id));
+router.post("/:id/join", (req, res, next) => {
+  try {
+    const { player2Id } = req.body;
+    const { id } = req.params;
+
+    if (!player2Id) {
+      const err = new Error("player2Id is required");
+      err.status = 400;
+      throw err;
+    }
+
+    const game = GameService.joinGame(id, player2Id);
+
+    res.json(game);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/:id", (req, res, next) => {
+  try {
+    const game = GameService.getGame(req.params.id);
+
+    if (!game) {
+      const err = new Error("Game not found");
+      err.status = 404;
+      throw err;
+    }
+
+    res.json(game);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/:id/move", (req, res, next) => {
+  try {
+    const { playerId, input } = req.body;
+    const { id } = req.params;
+
+    const game = GameService.submitMove(id, playerId, input);
+
+    res.json(game);
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;
