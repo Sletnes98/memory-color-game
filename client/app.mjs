@@ -1,4 +1,4 @@
-console.log("APP FILE LOADED");
+console.log("APP FILE LOADED 2");
 import { initI18n, translatePage } from "./i18n/i18n.mjs";
 import "./ui/userPanel.mjs";
 

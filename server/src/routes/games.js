@@ -1,9 +1,11 @@
 const express = require("express");
 const GameService = require("../services/gameService");
+const attachUser = require("../middleware/attachUser");
+const requireAuth = require("../middleware/requireAuth");
 
 const router = express.Router();
 
-router.post("/", (req, res, next) => {
+router.post("/", attachUser, requireAuth, (req, res, next) => {
   try {
     const { player1Id } = req.body;
 
@@ -21,7 +23,7 @@ router.post("/", (req, res, next) => {
   }
 });
 
-router.post("/:id/join", (req, res, next) => {
+router.post("/:id/join", attachUser, requireAuth, (req, res, next) => {
   try {
     const { player2Id } = req.body;
     const { id } = req.params;
@@ -56,7 +58,7 @@ router.get("/:id", (req, res, next) => {
   }
 });
 
-router.post("/:id/move", (req, res, next) => {
+router.post("/:id/move", attachUser, requireAuth, (req, res, next) => {
   try {
     const { playerId, input } = req.body;
     const { id } = req.params;
