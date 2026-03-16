@@ -5,68 +5,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title data-i18n="app.title"></title>
 
-  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="theme-color" content="#ffffff" />
 
   <link rel="stylesheet" href="./app.css" />
   <script type="module" src="./app.mjs"></script>
 </head>
 
-  <body>
-    <main>
-      <h1 data-i18n="app.title"></h1>
+<body>
+  <main>
+    <h1 data-i18n="app.title"></h1>
 
-      <template id="user-panel-template">
-        <section class="card">
+    <section class="card">
+      <h2>Login</h2>
 
-          <h2 data-i18n="user.sectionTitle"></h2>
+      <label>
+        <span>User ID</span>
+        <input
+          id="loginUserId"
+          type="text"
+          placeholder="Enter your user ID"
+        />
+      </label>
 
-          <label>
-            <span data-i18n="user.displayName.label"></span>
-            <input
-              id="displayName"
-              type="text"
-              data-i18n-attr="placeholder:input.displayName.placeholder"
-            />
-          </label>
+      <div class="row">
+        <button id="loginBtn">Log in</button>
+      </div>
 
-          <label>
-            <input id="terms" type="checkbox" />
-            <span data-i18n="user.acceptTerms"></span>
-            <a href="/terms" target="_blank" rel="noopener" data-i18n="link.terms"></a>
-          </label>
+      <p id="loginStatus" role="status" aria-live="polite"></p>
+    </section>
 
-          <label>
-            <input id="privacy" type="checkbox" />
-            <span data-i18n="user.acceptPrivacy"></span>
-            <a href="/privacy" target="_blank" rel="noopener" data-i18n="link.privacy"></a>
-          </label>
+    <template id="user-panel-template">
+      <section class="card">
+        <h2 data-i18n="user.sectionTitle"></h2>
 
-          <div class="row">
-            <button id="createBtn" data-i18n="user.create"></button>
-            <button id="getBtn" data-i18n="user.get"></button>
-            <button id="updateBtn" data-i18n="user.update"></button>
-            <button id="deleteBtn" data-i18n="user.delete"></button>
-          </div>
+        <label>
+          <span data-i18n="user.displayName.label"></span>
+          <input
+            id="displayName"
+            type="text"
+            data-i18n-attr="placeholder:input.displayName.placeholder"
+          />
+        </label>
 
-          <label>
-            <span data-i18n="user.id.label"></span>
+        <label>
+          <input id="terms" type="checkbox" />
+          <span data-i18n="user.acceptTerms"></span>
+          <a href="/terms" target="_blank" rel="noopener" data-i18n="link.terms"></a>
+        </label>
 
-            <input
-              id="userId"
-              type="text"
-              data-i18n-attr="placeholder:input.userId.placeholder"
-            />
+        <label>
+          <input id="privacy" type="checkbox" />
+          <span data-i18n="user.acceptPrivacy"></span>
+          <a href="/privacy" target="_blank" rel="noopener" data-i18n="link.privacy"></a>
+        </label>
 
-            <small data-i18n="user.help.createToGetId"></small>
-          </label>
+        <div class="row">
+          <button id="createBtn" data-i18n="user.create"></button>
+          <button id="getBtn" data-i18n="user.get"></button>
+          <button id="updateBtn" data-i18n="user.update"></button>
+          <button id="deleteBtn" data-i18n="user.delete"></button>
+        </div>
 
-          <pre id="debug" data-i18n="debug.ready" role="status" aria-live="polite"></pre>
+        <label>
+          <span data-i18n="user.id.label"></span>
+          <input
+            id="userId"
+            type="text"
+            data-i18n-attr="placeholder:input.userId.placeholder"
+          />
+          <small data-i18n="user.help.createToGetId"></small>
+        </label>
 
-        </section>
-      </template>
+        <pre id="debug" data-i18n="debug.ready" role="status" aria-live="polite"></pre>
+      </section>
+    </template>
 
-      <user-panel></user-panel>
-    </main>
-  </body>
-</html> kan du gi meg hele koden men riktig?
+    <user-panel></user-panel>
+
+    <section class="card" id="lobbySection" hidden>
+      <h2>Lobby</h2>
+
+      <p id="currentUserText">Logged in as:</p>
+
+      <div class="row">
+        <button id="createGameBtn">Create game</button>
+      </div>
+
+      <label>
+        <span>Game ID</span>
+        <input
+          id="joinGameId"
+          type="text"
+          placeholder="Enter game ID"
+        />
+      </label>
+
+      <div class="row">
+        <button id="joinGameBtn">Join game</button>
+        <button id="goToGameBtn">Go to game</button>
+        <button id="logoutBtn">Log out</button>
+      </div>
+
+      <pre id="lobbyStatus" role="status" aria-live="polite"></pre>
+    </section>
+  </main>
+</body>
+</html>
