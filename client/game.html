@@ -1,46 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Memory Color Game</title>
-  <p id="currentUser"></p>
-  <p id="turnInfo"></p>
-  <p id="players"></p>
 
-  <link rel="stylesheet" href="./app.css">
-  <link rel="stylesheet" href="./game/game.css">
+  <link rel="stylesheet" href="./app.css" />
+  <link rel="stylesheet" href="./game/game.css" />
 
-  <script type="module">
-    import "./game/gamePage.mjs";
-  </script>
-
+  <script type="module" src="./game/gamePage.mjs"></script>
 </head>
 
 <body>
-
   <main>
+    <p id="currentUser"></p>
+    <p id="turnInfo"></p>
+    <p id="players"></p>
 
-    <h1 style="text-align:center;">Memory Fargespill</h1>
+    <h1 style="text-align: center;">Memory Fargespill</h1>
 
-    <section class="game-board">
+    <div class="board-wrap">
+      <div id="sequenceOverlay" class="sequence-overlay hidden">
+        <button id="showSequenceBtn" type="button">Vis sekvens</button>
+      </div>
 
-      <button class="color-btn blue" data-color="blue" aria-label="Blue"></button>
+      <section class="game-board">
+        <button class="color-btn blue" data-color="blue" aria-label="Blue"></button>
+        <button class="color-btn red" data-color="red" aria-label="Red"></button>
+        <button class="color-btn green" data-color="green" aria-label="Green"></button>
+        <button class="color-btn yellow" data-color="yellow" aria-label="Yellow"></button>
+      </section>
+    </div>
 
-      <button class="color-btn red" data-color="red" aria-label="Red"></button>
-
-      <button class="color-btn green" data-color="green" aria-label="Green"></button>
-
-      <button class="color-btn yellow" data-color="yellow" aria-label="Yellow"></button>
-
-    </section>
-
-    <p class="status" id="status">
-      Waiting for game...
-    </p>
-
+    <p class="status" id="status">Waiting for game...</p>
   </main>
-
 </body>
-</ht
+</html>

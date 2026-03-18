@@ -2,6 +2,9 @@ console.log("Game page loaded");
 
 const currentUserEl = document.getElementById("currentUser");
 const turnInfoEl = document.getElementById("turnInfo");
+const playersEl = document.getElementById("players");
+const sequenceOverlay = document.getElementById("sequenceOverlay");
+const showSequenceBtn = document.getElementById("showSequenceBtn");
 const buttons = document.querySelectorAll(".color-btn");
 const status = document.getElementById("status");
 
@@ -30,6 +33,36 @@ async function getUserName(userId) {
   userNames[userId] = user.display_name || userId;
 
   return userNames[userId];
+}
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+function getButtonByColor(color) {
+  return document.querySelector(`.color-btn[data-color="${color}"]`);
+}
+
+function disableButtons() {
+  buttons.forEach((btn) => {
+    btn.disabled = true;
+  });
+}
+
+function enableButtons() {
+  buttons.forEach((btn) => {
+    btn.disabled = false;
+  });
+}
+
+function showSequencePrompt() {
+  sequenceOverlay.classList.remove("hidden");
+}
+
+function hideSequencePrompt() {
+  sequenceOverlay.classList.add("hidden");
 }
 
 function updateTurnInfo() {
@@ -68,30 +101,18 @@ function updateTurnInfo() {
   }
 }
 
-function disableButtons() {
-  buttons.forEach((btn) => {
-    btn.disabled = true;
-  });
-}
-
-function enableButtons() {
-  buttons.forEach((btn) => {
-    btn.disabled = false;
-  });
-}
-
-function getButtonByColor(color) {
-  return document.querySelector(`.color-btn[data-color="${color}"]`);
-}
-
-function wait(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 async function showSequence(sequence) {
+  hideSequencePrompt();
+
   if (!sequence.length) {
+    showingSequence = false;
+    inputLocked = false;
+
+    if (currentGame && currentGame.currentTurn === playerId && currentGame.status === "playing") {
+      enableButtons();
+    }
+
+    updateTurnInfo();
     return;
   }
 
@@ -125,6 +146,7 @@ async function loadGame() {
   if (!gameId) {
     status.textContent = "No game found.";
     turnInfoEl.textContent = "";
+    playersEl.textContent = "";
     return;
   }
 
@@ -133,6 +155,7 @@ async function loadGame() {
   if (!res.ok) {
     status.textContent = "Game not found or server restarted.";
     turnInfoEl.textContent = "";
+    playersEl.textContent = "";
     clearInterval(gameLoop);
     return;
   }
@@ -153,6 +176,8 @@ async function loadGame() {
   const currentTurnName = await getUserName(game.currentTurn);
   const winnerName = await getUserName(game.winnerId);
 
+  playersEl.textContent = `Players: ${player1Name} vs ${player2Name}`;
+
   const turnChanged = previousTurn !== game.currentTurn;
   const sequenceChanged = previousLength !== game.sequence.length;
   const statusChanged = previousStatus !== game.status;
@@ -165,6 +190,7 @@ async function loadGame() {
   if (game.status === "waiting") {
     status.textContent = `Waiting for player 2... (${player1Name} is ready)`;
     disableButtons();
+    hideSequencePrompt();
     updateTurnInfo();
     return;
   }
@@ -172,6 +198,7 @@ async function loadGame() {
   if (game.status === "finished") {
     status.textContent = `Game finished. Winner: ${winnerName}`;
     disableButtons();
+    hideSequencePrompt();
     updateTurnInfo();
     return;
   }
@@ -181,17 +208,25 @@ async function loadGame() {
   } else {
     status.textContent = `🔴 ${currentTurnName}'s turn | Sequence: ${game.sequence.length}`;
     disableButtons();
+    hideSequencePrompt();
   }
 
-  const shouldShowSequence =
+  const shouldPrepareSequence =
     game.currentTurn === playerId &&
     !showingSequence &&
     (lastShownTurn !== game.currentTurn || lastShownLength !== game.sequence.length);
 
-  if (shouldShowSequence) {
-    lastShownTurn = game.currentTurn;
-    lastShownLength = game.sequence.length;
-    await showSequence(game.sequence);
+  if (shouldPrepareSequence) {
+    inputLocked = true;
+    disableButtons();
+
+    if (game.sequence.length === 0) {
+      showSequenceBtn.textContent = "Start round";
+    } else {
+      showSequenceBtn.textContent = "Vis sekvens";
+    }
+
+    showSequencePrompt();
   } else if (game.currentTurn === playerId && !inputLocked && !showingSequence) {
     enableButtons();
   }
@@ -277,8 +312,6 @@ function handleColorClick(color) {
     }, 180);
   }
 
-  console.log("Current input:", currentInput);
-
   status.textContent = `Your input: ${currentInput.join(", ")}`;
   updateTurnInfo();
 
@@ -289,6 +322,16 @@ function handleColorClick(color) {
     sendMove();
   }
 }
+
+showSequenceBtn.addEventListener("click", async () => {
+  if (!currentGame) return;
+  if (currentGame.currentTurn !== playerId) return;
+
+  lastShownTurn = currentGame.currentTurn;
+  lastShownLength = currentGame.sequence.length;
+
+  await showSequence(currentGame.sequence);
+});
 
 buttons.forEach((btn) => {
   btn.addEventListener("click", () => {

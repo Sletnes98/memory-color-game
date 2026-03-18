@@ -1,12 +1,13 @@
-console.log("APP FILE LOADED 2");
 import { initI18n, translatePage } from "./i18n/i18n.mjs";
 import "./ui/userPanel.mjs";
 
 await initI18n();
 translatePage();
 
+console.log("App loaded");
+
 /*
-SERVICE WORKER
+  Service worker
 */
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
@@ -20,7 +21,7 @@ if ("serviceWorker" in navigator) {
 }
 
 /*
-ELEMENTS
+  Elements
 */
 const loginBtn = document.getElementById("loginBtn");
 const loginUserId = document.getElementById("loginUserId");
@@ -36,49 +37,31 @@ const joinGameId = document.getElementById("joinGameId");
 const lobbyStatus = document.getElementById("lobbyStatus");
 
 /*
-STARTUP
+  Session helpers
 */
-const savedUserId = localStorage.getItem("userId");
+function getUserId() {
+  return sessionStorage.getItem("userId");
+}
 
-if (savedUserId) {
-  showLobby(savedUserId);
+function getGameId() {
+  return sessionStorage.getItem("gameId");
+}
+
+function saveUserId(userId) {
+  sessionStorage.setItem("userId", userId);
+}
+
+function saveGameId(gameId) {
+  sessionStorage.setItem("gameId", gameId);
+}
+
+function clearSession() {
+  sessionStorage.removeItem("userId");
+  sessionStorage.removeItem("gameId");
 }
 
 /*
-LOGIN
-*/
-loginBtn?.addEventListener("click", async () => {
-  const userId = loginUserId.value.trim();
-
-  if (!userId) {
-    loginStatus.textContent = "Skriv inn en bruker-ID.";
-    return;
-  }
-
-  loginStatus.textContent = "Logger inn...";
-
-  try {
-    const res = await fetch(`/users/${userId}`);
-
-    if (!res.ok) {
-      loginStatus.textContent = "Fant ikke bruker.";
-      return;
-    }
-
-    const user = await res.json();
-
-    localStorage.setItem("userId", user.id);
-
-    loginStatus.textContent = "Innlogging vellykket.";
-    showLobby(user.id);
-  } catch (error) {
-    loginStatus.textContent = "Kunne ikke logge inn.";
-    console.error(error);
-  }
-});
-
-/*
-SHOW LOBBY
+  UI helpers
 */
 function showLobby(userId) {
   lobbySection.hidden = false;
@@ -86,21 +69,70 @@ function showLobby(userId) {
   lobbySection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+function showLoginMessage(message) {
+  loginStatus.textContent = message;
+}
+
+function showLobbyMessage(message) {
+  lobbyStatus.textContent = message;
+}
+
 /*
-CREATE GAME
+  Startup
 */
-createGameBtn?.addEventListener("click", async () => {
-  const userId = localStorage.getItem("userId");
+const savedUserId = getUserId();
+
+if (savedUserId) {
+  showLobby(savedUserId);
+}
+
+/*
+  Login
+*/
+loginBtn?.addEventListener("click", async () => {
+  const userId = loginUserId.value.trim();
 
   if (!userId) {
-    lobbyStatus.textContent = "Du må logge inn først.";
+    showLoginMessage("Skriv inn en bruker-ID.");
     return;
   }
 
-  lobbyStatus.textContent = "Lager spill...";
+  showLoginMessage("Logger inn...");
 
   try {
-    const res = await fetch("/games", {
+    const response = await fetch(`/users/${userId}`);
+
+    if (!response.ok) {
+      showLoginMessage("Fant ikke bruker.");
+      return;
+    }
+
+    const user = await response.json();
+
+    saveUserId(user.id);
+    showLoginMessage("Innlogging vellykket.");
+    showLobby(user.id);
+  } catch (error) {
+    showLoginMessage("Kunne ikke logge inn.");
+    console.error(error);
+  }
+});
+
+/*
+  Create game
+*/
+createGameBtn?.addEventListener("click", async () => {
+  const userId = getUserId();
+
+  if (!userId) {
+    showLobbyMessage("Du må logge inn først.");
+    return;
+  }
+
+  showLobbyMessage("Lager spill...");
+
+  try {
+    const response = await fetch("/games", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -110,44 +142,43 @@ createGameBtn?.addEventListener("click", async () => {
       })
     });
 
-    if (!res.ok) {
-      lobbyStatus.textContent = "Kunne ikke lage spill.";
+    if (!response.ok) {
+      showLobbyMessage("Kunne ikke lage spill.");
       return;
     }
 
-    const game = await res.json();
+    const game = await response.json();
 
-    localStorage.setItem("gameId", game.id);
-
-    lobbyStatus.textContent = "Game created: " + game.id;
+    saveGameId(game.id);
     joinGameId.value = game.id;
+    showLobbyMessage("Game created: " + game.id);
   } catch (error) {
-    lobbyStatus.textContent = "Kunne ikke lage spill.";
+    showLobbyMessage("Kunne ikke lage spill.");
     console.error(error);
   }
 });
 
 /*
-JOIN GAME
+  Join game
 */
 joinGameBtn?.addEventListener("click", async () => {
+  const userId = getUserId();
   const gameId = joinGameId.value.trim();
-  const userId = localStorage.getItem("userId");
 
   if (!userId) {
-    lobbyStatus.textContent = "Du må logge inn først.";
+    showLobbyMessage("Du må logge inn først.");
     return;
   }
 
   if (!gameId) {
-    lobbyStatus.textContent = "Skriv inn game ID.";
+    showLobbyMessage("Skriv inn game ID.");
     return;
   }
 
-  lobbyStatus.textContent = "Blir med i spill...";
+  showLobbyMessage("Blir med i spill...");
 
   try {
-    const res = await fetch(`/games/${gameId}/join`, {
+    const response = await fetch(`/games/${gameId}/join`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -157,30 +188,29 @@ joinGameBtn?.addEventListener("click", async () => {
       })
     });
 
-    if (!res.ok) {
-      lobbyStatus.textContent = "Kunne ikke bli med i spillet.";
+    if (!response.ok) {
+      showLobbyMessage("Kunne ikke bli med i spillet.");
       return;
     }
 
-    const game = await res.json();
+    const game = await response.json();
 
-    localStorage.setItem("gameId", game.id);
-
-    lobbyStatus.textContent = "Joined game: " + game.id;
+    saveGameId(game.id);
+    showLobbyMessage("Joined game: " + game.id);
   } catch (error) {
-    lobbyStatus.textContent = "Kunne ikke bli med i spillet.";
+    showLobbyMessage("Kunne ikke bli med i spillet.");
     console.error(error);
   }
 });
 
 /*
-GO TO GAME
+  Go to game
 */
 goToGameBtn?.addEventListener("click", () => {
-  const gameId = localStorage.getItem("gameId");
+  const gameId = getGameId();
 
   if (!gameId) {
-    lobbyStatus.textContent = "Lag eller join et spill først.";
+    showLobbyMessage("Lag eller join et spill først.");
     return;
   }
 
@@ -188,10 +218,9 @@ goToGameBtn?.addEventListener("click", () => {
 });
 
 /*
-LOG OUT
+  Log out
 */
 logoutBtn?.addEventListener("click", () => {
-  localStorage.removeItem("userId");
-  localStorage.removeItem("gameId");
+  clearSession();
   location.reload();
 });
