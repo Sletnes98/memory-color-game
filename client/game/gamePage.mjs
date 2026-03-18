@@ -12,6 +12,9 @@ let currentInput = [];
 let currentGame = null;
 let userNames = {};
 let inputLocked = false;
+let showingSequence = false;
+let lastShownTurn = null;
+let lastShownLength = -1;
 
 async function getUserName(userId) {
   if (!userId) return "Unknown";
@@ -45,6 +48,11 @@ function updateTurnInfo() {
     return;
   }
 
+  if (showingSequence) {
+    turnInfoEl.textContent = "Watch the sequence...";
+    return;
+  }
+
   if (currentGame.currentTurn !== playerId) {
     turnInfoEl.textContent = "Wait for your turn.";
     return;
@@ -70,6 +78,47 @@ function enableButtons() {
   buttons.forEach((btn) => {
     btn.disabled = false;
   });
+}
+
+function getButtonByColor(color) {
+  return document.querySelector(`.color-btn[data-color="${color}"]`);
+}
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function showSequence(sequence) {
+  if (!sequence.length) {
+    return;
+  }
+
+  showingSequence = true;
+  inputLocked = true;
+  disableButtons();
+  updateTurnInfo();
+
+  for (const color of sequence) {
+    const button = getButtonByColor(color);
+
+    if (!button) continue;
+
+    button.classList.add("active");
+    await wait(600);
+    button.classList.remove("active");
+    await wait(250);
+  }
+
+  showingSequence = false;
+  inputLocked = false;
+
+  if (currentGame && currentGame.currentTurn === playerId && currentGame.status === "playing") {
+    enableButtons();
+  }
+
+  updateTurnInfo();
 }
 
 async function loadGame() {
@@ -129,12 +178,22 @@ async function loadGame() {
 
   if (game.currentTurn === playerId) {
     status.textContent = `🟢 YOUR TURN | Sequence: ${game.sequence.length}`;
-    if (!inputLocked) {
-      enableButtons();
-    }
   } else {
     status.textContent = `🔴 ${currentTurnName}'s turn | Sequence: ${game.sequence.length}`;
     disableButtons();
+  }
+
+  const shouldShowSequence =
+    game.currentTurn === playerId &&
+    !showingSequence &&
+    (lastShownTurn !== game.currentTurn || lastShownLength !== game.sequence.length);
+
+  if (shouldShowSequence) {
+    lastShownTurn = game.currentTurn;
+    lastShownLength = game.sequence.length;
+    await showSequence(game.sequence);
+  } else if (game.currentTurn === playerId && !inputLocked && !showingSequence) {
+    enableButtons();
   }
 
   updateTurnInfo();
@@ -161,7 +220,7 @@ async function sendMove() {
     currentInput = [];
     inputLocked = false;
 
-    if (currentGame?.currentTurn === playerId) {
+    if (currentGame?.currentTurn === playerId && !showingSequence) {
       enableButtons();
     }
 
@@ -182,6 +241,7 @@ async function sendMove() {
 function handleColorClick(color) {
   if (!currentGame) return;
   if (inputLocked) return;
+  if (showingSequence) return;
 
   if (currentGame.status === "finished") {
     status.textContent = "Game finished.";
@@ -208,6 +268,14 @@ function handleColorClick(color) {
   }
 
   currentInput.push(color);
+
+  const button = getButtonByColor(color);
+  if (button) {
+    button.classList.add("active");
+    setTimeout(() => {
+      button.classList.remove("active");
+    }, 180);
+  }
 
   console.log("Current input:", currentInput);
 

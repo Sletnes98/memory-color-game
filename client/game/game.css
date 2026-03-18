@@ -46,3 +46,13 @@
   margin-top: 0.5rem;
   margin-bottom: 1rem;
 }
+.color-btn.active {
+  transform: scale(1.06);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.8), 0 0 20px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.2);
+}
+
+.color-btn:disabled {
+  opacity: 0.85;
+  cursor: not-allowed;
+}
