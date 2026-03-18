@@ -1,14 +1,30 @@
-console.log("NEW VERSION LOADED");
 console.log("Game page loaded");
 
 const buttons = document.querySelectorAll(".color-btn");
 const status = document.getElementById("status");
 
-const gameId = localStorage.getItem("gameId");
-const playerId = localStorage.getItem("userId");
+const gameId = sessionStorage.getItem("gameId") || localStorage.getItem("gameId");
+const playerId = sessionStorage.getItem("userId") || localStorage.getItem("userId");
 
 let currentInput = [];
 let currentGame = null;
+let userNames = {};
+
+async function getUserName(userId) {
+  if (!userId) return "Unknown";
+  if (userNames[userId]) return userNames[userId];
+
+  const res = await fetch(`/users/${userId}`);
+
+  if (!res.ok) {
+    return userId;
+  }
+
+  const user = await res.json();
+  userNames[userId] = user.display_name || userId;
+
+  return userNames[userId];
+}
 
 async function loadGame() {
   if (!gameId) {
@@ -17,21 +33,32 @@ async function loadGame() {
   }
 
   const res = await fetch(`/games/${gameId}`);
+
+  if (!res.ok) {
+    status.textContent = "Could not load game.";
+    return;
+  }
+
   const game = await res.json();
-
   currentGame = game;
-  currentInput = [];
 
-  console.log("Game state:", game);
+  const player1Name = await getUserName(game.player1Id);
+  const player2Name = await getUserName(game.player2Id);
+  const currentTurnName = await getUserName(game.currentTurn);
+  const winnerName = await getUserName(game.winnerId);
+
+  if (game.status === "waiting") {
+    status.textContent = `Waiting for player 2... (${player1Name} is ready)`;
+    return;
+  }
 
   if (game.status === "finished") {
-    status.textContent = "Game finished. Winner: " + game.winnerId;
+    status.textContent = `Game finished. Winner: ${winnerName}`;
     return;
   }
 
   status.textContent =
-    "Turn: " + game.currentTurn +
-    " | Sequence length: " + game.sequence.length;
+    `Turn: ${currentTurnName} | Sequence length: ${game.sequence.length} | Players: ${player1Name} vs ${player2Name}`;
 }
 
 async function sendMove() {
@@ -48,6 +75,7 @@ async function sendMove() {
 
   if (!res.ok) {
     status.textContent = "Wrong move or wrong player's turn.";
+    currentInput = [];
     return;
   }
 
@@ -67,6 +95,11 @@ function handleColorClick(color) {
     return;
   }
 
+  if (currentGame.status === "waiting") {
+    status.textContent = "Waiting for player 2...";
+    return;
+  }
+
   if (currentGame.currentTurn !== playerId) {
     status.textContent = "It is not your turn.";
     return;
@@ -76,9 +109,7 @@ function handleColorClick(color) {
 
   console.log("Current input:", currentInput);
 
-  status.textContent =
-    "Your input: " +
-    currentInput.join(", ");
+  status.textContent = `Your input: ${currentInput.join(", ")}`;
 
   const requiredLength = currentGame.sequence.length + 1;
 
@@ -90,9 +121,9 @@ function handleColorClick(color) {
 buttons.forEach((btn) => {
   btn.addEventListener("click", () => {
     const color = btn.dataset.color;
-    console.log("Clicked:", color);
     handleColorClick(color);
   });
 });
 
 loadGame();
+setInterval(loadGame, 1000);
