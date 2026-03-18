@@ -1,40 +1,38 @@
 console.log("Game page loaded");
 
+/*
+  Elements
+*/
 const currentUserEl = document.getElementById("currentUser");
 const turnInfoEl = document.getElementById("turnInfo");
 const playersEl = document.getElementById("players");
 const sequenceOverlay = document.getElementById("sequenceOverlay");
 const showSequenceBtn = document.getElementById("showSequenceBtn");
-const buttons = document.querySelectorAll(".color-btn");
-const status = document.getElementById("status");
+const statusEl = document.getElementById("status");
+const colorButtons = document.querySelectorAll(".color-btn");
 
-const gameId = sessionStorage.getItem("gameId") || localStorage.getItem("gameId");
-const playerId = sessionStorage.getItem("userId") || localStorage.getItem("userId");
+/*
+  Session data
+*/
+const gameId = sessionStorage.getItem("gameId");
+const playerId = sessionStorage.getItem("userId");
 
-let currentInput = [];
+/*
+  State
+*/
 let currentGame = null;
-let userNames = {};
+let currentInput = [];
+let cachedNames = {};
+
 let inputLocked = false;
 let showingSequence = false;
+
 let lastShownTurn = null;
 let lastShownLength = -1;
 
-async function getUserName(userId) {
-  if (!userId) return "Unknown";
-  if (userNames[userId]) return userNames[userId];
-
-  const res = await fetch(`/users/${userId}`);
-
-  if (!res.ok) {
-    return userId;
-  }
-
-  const user = await res.json();
-  userNames[userId] = user.display_name || userId;
-
-  return userNames[userId];
-}
-
+/*
+  Helpers
+*/
 function wait(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
@@ -46,14 +44,14 @@ function getButtonByColor(color) {
 }
 
 function disableButtons() {
-  buttons.forEach((btn) => {
-    btn.disabled = true;
+  colorButtons.forEach((button) => {
+    button.disabled = true;
   });
 }
 
 function enableButtons() {
-  buttons.forEach((btn) => {
-    btn.disabled = false;
+  colorButtons.forEach((button) => {
+    button.disabled = false;
   });
 }
 
@@ -63,6 +61,37 @@ function showSequencePrompt() {
 
 function hideSequencePrompt() {
   sequenceOverlay.classList.add("hidden");
+}
+
+function setStatus(message) {
+  statusEl.textContent = message;
+}
+
+function clearRoundInput() {
+  currentInput = [];
+}
+
+async function getUserName(userId) {
+  if (!userId) {
+    return "Unknown";
+  }
+
+  if (cachedNames[userId]) {
+    return cachedNames[userId];
+  }
+
+  const response = await fetch(`/users/${userId}`);
+
+  if (!response.ok) {
+    return userId;
+  }
+
+  const user = await response.json();
+  const name = user.display_name || userId;
+
+  cachedNames[userId] = name;
+
+  return name;
 }
 
 function updateTurnInfo() {
@@ -91,20 +120,23 @@ function updateTurnInfo() {
     return;
   }
 
-  const requiredLength = currentGame.sequence.length + 1;
-  const remaining = requiredLength - currentInput.length;
+  const clicksNeeded = currentGame.sequence.length + 1;
+  const clicksLeft = clicksNeeded - currentInput.length;
 
-  if (remaining > 0) {
-    turnInfoEl.textContent = `Clicks left this round: ${remaining}`;
+  if (clicksLeft > 0) {
+    turnInfoEl.textContent = `Clicks left this round: ${clicksLeft}`;
   } else {
     turnInfoEl.textContent = "Checking move...";
   }
 }
 
+/*
+  Sequence
+*/
 async function showSequence(sequence) {
   hideSequencePrompt();
 
-  if (!sequence.length) {
+  if (sequence.length === 0) {
     showingSequence = false;
     inputLocked = false;
 
@@ -124,7 +156,9 @@ async function showSequence(sequence) {
   for (const color of sequence) {
     const button = getButtonByColor(color);
 
-    if (!button) continue;
+    if (!button) {
+      continue;
+    }
 
     button.classList.add("active");
     await wait(600);
@@ -142,25 +176,28 @@ async function showSequence(sequence) {
   updateTurnInfo();
 }
 
+/*
+  Load game
+*/
 async function loadGame() {
   if (!gameId) {
-    status.textContent = "No game found.";
+    setStatus("No game found.");
     turnInfoEl.textContent = "";
     playersEl.textContent = "";
     return;
   }
 
-  const res = await fetch(`/games/${gameId}`);
+  const response = await fetch(`/games/${gameId}`);
 
-  if (!res.ok) {
-    status.textContent = "Game not found or server restarted.";
+  if (!response.ok) {
+    setStatus("Game not found or server restarted.");
     turnInfoEl.textContent = "";
     playersEl.textContent = "";
     clearInterval(gameLoop);
     return;
   }
 
-  const game = await res.json();
+  const game = await response.json();
 
   const previousTurn = currentGame?.currentTurn;
   const previousLength = currentGame?.sequence.length;
@@ -168,14 +205,13 @@ async function loadGame() {
 
   currentGame = game;
 
-  const me = await getUserName(playerId);
-  currentUserEl.textContent = `Logged in as: ${me}`;
-
+  const myName = await getUserName(playerId);
   const player1Name = await getUserName(game.player1Id);
   const player2Name = await getUserName(game.player2Id);
   const currentTurnName = await getUserName(game.currentTurn);
   const winnerName = await getUserName(game.winnerId);
 
+  currentUserEl.textContent = `Logged in as: ${myName}`;
   playersEl.textContent = `Players: ${player1Name} vs ${player2Name}`;
 
   const turnChanged = previousTurn !== game.currentTurn;
@@ -183,12 +219,12 @@ async function loadGame() {
   const statusChanged = previousStatus !== game.status;
 
   if (turnChanged || sequenceChanged || statusChanged) {
-    currentInput = [];
+    clearRoundInput();
     inputLocked = false;
   }
 
   if (game.status === "waiting") {
-    status.textContent = `Waiting for player 2... (${player1Name} is ready)`;
+    setStatus(`Waiting for player 2... (${player1Name} is ready)`);
     disableButtons();
     hideSequencePrompt();
     updateTurnInfo();
@@ -196,7 +232,7 @@ async function loadGame() {
   }
 
   if (game.status === "finished") {
-    status.textContent = `Game finished. Winner: ${winnerName}`;
+    setStatus(`Game finished. Winner: ${winnerName}`);
     disableButtons();
     hideSequencePrompt();
     updateTurnInfo();
@@ -204,9 +240,9 @@ async function loadGame() {
   }
 
   if (game.currentTurn === playerId) {
-    status.textContent = `🟢 YOUR TURN | Sequence: ${game.sequence.length}`;
+    setStatus(`🟢 YOUR TURN | Sequence: ${game.sequence.length}`);
   } else {
-    status.textContent = `🔴 ${currentTurnName}'s turn | Sequence: ${game.sequence.length}`;
+    setStatus(`🔴 ${currentTurnName}'s turn | Sequence: ${game.sequence.length}`);
     disableButtons();
     hideSequencePrompt();
   }
@@ -234,12 +270,15 @@ async function loadGame() {
   updateTurnInfo();
 }
 
+/*
+  Send move
+*/
 async function sendMove() {
   inputLocked = true;
   disableButtons();
   updateTurnInfo();
 
-  const res = await fetch(`/games/${gameId}/move`, {
+  const response = await fetch(`/games/${gameId}/move`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -250,9 +289,9 @@ async function sendMove() {
     })
   });
 
-  if (!res.ok) {
-    status.textContent = "Wrong move or wrong player's turn.";
-    currentInput = [];
+  if (!response.ok) {
+    setStatus("Wrong move or wrong player's turn.");
+    clearRoundInput();
     inputLocked = false;
 
     if (currentGame?.currentTurn === playerId && !showingSequence) {
@@ -263,39 +302,45 @@ async function sendMove() {
     return;
   }
 
-  const updatedGame = await res.json();
-
-  console.log("Move result:", updatedGame);
+  const updatedGame = await response.json();
 
   currentGame = updatedGame;
-  currentInput = [];
+  clearRoundInput();
   inputLocked = false;
+
   loadGame();
 }
 
+/*
+  Click handling
+*/
 function handleColorClick(color) {
-  if (!currentGame) return;
-  if (inputLocked) return;
-  if (showingSequence) return;
+  if (!currentGame) {
+    return;
+  }
+
+  if (inputLocked || showingSequence) {
+    return;
+  }
 
   if (currentGame.status === "finished") {
-    status.textContent = "Game finished.";
+    setStatus("Game finished.");
     return;
   }
 
   if (currentGame.status === "waiting") {
-    status.textContent = "Waiting for player 2...";
+    setStatus("Waiting for player 2...");
     return;
   }
 
   if (currentGame.currentTurn !== playerId) {
-    status.textContent = "It is not your turn.";
+    setStatus("It is not your turn.");
     return;
   }
 
-  const requiredLength = currentGame.sequence.length + 1;
+  const clicksNeeded = currentGame.sequence.length + 1;
 
-  if (currentInput.length >= requiredLength) {
+  if (currentInput.length >= clicksNeeded) {
     inputLocked = true;
     disableButtons();
     updateTurnInfo();
@@ -305,17 +350,19 @@ function handleColorClick(color) {
   currentInput.push(color);
 
   const button = getButtonByColor(color);
+
   if (button) {
     button.classList.add("active");
+
     setTimeout(() => {
       button.classList.remove("active");
     }, 180);
   }
 
-  status.textContent = `Your input: ${currentInput.join(", ")}`;
+  setStatus(`Your input: ${currentInput.join(", ")}`);
   updateTurnInfo();
 
-  if (currentInput.length === requiredLength) {
+  if (currentInput.length === clicksNeeded) {
     inputLocked = true;
     disableButtons();
     updateTurnInfo();
@@ -323,9 +370,17 @@ function handleColorClick(color) {
   }
 }
 
+/*
+  Events
+*/
 showSequenceBtn.addEventListener("click", async () => {
-  if (!currentGame) return;
-  if (currentGame.currentTurn !== playerId) return;
+  if (!currentGame) {
+    return;
+  }
+
+  if (currentGame.currentTurn !== playerId) {
+    return;
+  }
 
   lastShownTurn = currentGame.currentTurn;
   lastShownLength = currentGame.sequence.length;
@@ -333,12 +388,15 @@ showSequenceBtn.addEventListener("click", async () => {
   await showSequence(currentGame.sequence);
 });
 
-buttons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const color = btn.dataset.color;
+colorButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const color = button.dataset.color;
     handleColorClick(color);
   });
 });
 
+/*
+  Start
+*/
 loadGame();
 const gameLoop = setInterval(loadGame, 1000);
