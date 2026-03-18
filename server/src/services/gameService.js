@@ -4,11 +4,6 @@ const games = new Map();
 
 const colors = ["red", "green", "blue", "yellow"];
 
-function randomColor() {
-  const index = Math.floor(Math.random() * colors.length);
-  return colors[index];
-}
-
 function createGame(player1Id) {
   const game = {
     id: crypto.randomUUID(),
@@ -52,7 +47,7 @@ function joinGame(gameId, player2Id) {
   }
 
   game.player2Id = player2Id;
-  game.sequence = [randomColor()];
+  game.sequence = [];
   game.currentTurn = game.player1Id;
   game.status = "playing";
 
