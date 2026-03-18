@@ -1,14 +1,11 @@
-self.addEventListener("install", (event) => {
-  console.log("Service worker installing...");
+self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
-  console.log("Service worker activating...");
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener("fetch", (event) => {
-  // IKKE cache noe i dev
+self.addEventListener("fetch", () => {
   return;
 });
