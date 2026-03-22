@@ -1,54 +1,47 @@
 require("dotenv").config();
 
 const express = require("express");
-const path = require("path");
 const fs = require("fs");
-
-const app = express();
-
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "../../client")));
+const path = require("path");
 
 const usersRouter = require("./routes/users");
 const gamesRouter = require("./routes/games");
 const pool = require("./db");
 
+const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* -----------------------
-   Health check
------------------------ */
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "../../client")));
+
 app.get("/health", (req, res) => {
   res.json({ ok: true });
 });
 
-/* -----------------------
-   Routes
------------------------ */
-app.use("/users", usersRouter);
-app.use("/games", gamesRouter);
+app.get("/db-test", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW() as now");
+    res.json({ ok: true, now: result.rows[0].now });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+  }
+});
 
-/* -----------------------
-   Terms of Service
------------------------ */
 app.get("/terms", (req, res) => {
   const filePath = path.join(__dirname, "../../TERMS.md");
   const content = fs.readFileSync(filePath, "utf-8");
   res.type("text/plain").send(content);
 });
 
-/* -----------------------
-   Privacy Policy
------------------------ */
 app.get("/privacy", (req, res) => {
   const filePath = path.join(__dirname, "../../PRIVACY.md");
   const content = fs.readFileSync(filePath, "utf-8");
   res.type("text/plain").send(content);
 });
 
-/* -----------------------
-   Database init
------------------------ */
+app.use("/users", usersRouter);
+app.use("/games", gamesRouter);
+
 async function initDb() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -59,32 +52,19 @@ async function initDb() {
       accepted_privacy_at timestamptz NOT NULL
     );
   `);
-
-  console.log("Users table ready");
 }
 
-/* -----------------------
-   DB test endpoint
------------------------ */
-app.get("/db-test", async (req, res) => {
+async function startServer() {
   try {
-    const result = await pool.query("SELECT NOW() as now");
-    res.json({ ok: true, now: result.rows[0].now });
-  } catch (err) {
-    res.status(500).json({ ok: false, error: err.message });
-  }
-});
+    await initDb();
 
-/* -----------------------
-   Start server
------------------------ */
-initDb()
-  .then(() => {
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on port ${PORT}`);
     });
-  })
-  .catch((err) => {
-    console.error("Failed to initialize database:", err);
+  } catch (error) {
+    console.error("Failed to initialize database:", error);
     process.exit(1);
-  });
+  }
+}
+
+startServer();

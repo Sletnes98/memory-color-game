@@ -3,9 +3,9 @@ const crypto = require("crypto");
 
 function requireDisplayName(displayName) {
   if (!displayName || !displayName.trim()) {
-    const err = new Error("displayName is required");
-    err.status = 400;
-    throw err;
+    const error = new Error("displayName is required");
+    error.status = 400;
+    throw error;
   }
 }
 
@@ -27,7 +27,11 @@ async function createUser({ displayName, acceptedTermsAt, acceptedPrivacyAt }) {
 }
 
 async function getUser(id) {
-  const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
+  const result = await pool.query(
+    `SELECT * FROM users WHERE id = $1`,
+    [id]
+  );
+
   return result.rows[0] || null;
 }
 
@@ -48,12 +52,15 @@ async function updateUser(id, displayName) {
 }
 
 async function deleteUser(id) {
-  await pool.query(`DELETE FROM users WHERE id = $1`, [id]);
+  await pool.query(
+    `DELETE FROM users WHERE id = $1`,
+    [id]
+  );
 }
 
 module.exports = {
   createUser,
   getUser,
   updateUser,
-  deleteUser,
+  deleteUser
 };

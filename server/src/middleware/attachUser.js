@@ -1,11 +1,10 @@
 function attachUser(req, res, next) {
-  const userId =
-    req.body.player1Id ||
-    req.body.player2Id ||
-    req.body.playerId;
+  const { player1Id, player2Id, playerId } = req.body;
 
-  if (userId) {
-    req.user = { id: userId };
+  const id = player1Id || player2Id || playerId;
+
+  if (id) {
+    req.user = { id };
   }
 
   next();

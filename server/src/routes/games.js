@@ -10,64 +10,65 @@ router.post("/", attachUser, requireAuth, (req, res, next) => {
     const { player1Id } = req.body;
 
     if (!player1Id) {
-      const err = new Error("player1Id is required");
-      err.status = 400;
-      throw err;
+      const error = new Error("player1Id is required");
+      error.status = 400;
+      throw error;
     }
 
     const game = GameService.createGame(player1Id);
 
     res.status(201).json(game);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 });
 
 router.post("/:id/join", attachUser, requireAuth, (req, res, next) => {
   try {
-    const { player2Id } = req.body;
     const { id } = req.params;
+    const { player2Id } = req.body;
 
     if (!player2Id) {
-      const err = new Error("player2Id is required");
-      err.status = 400;
-      throw err;
+      const error = new Error("player2Id is required");
+      error.status = 400;
+      throw error;
     }
 
     const game = GameService.joinGame(id, player2Id);
 
     res.json(game);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 });
 
 router.get("/:id", (req, res, next) => {
   try {
-    const game = GameService.getGame(req.params.id);
+    const { id } = req.params;
+    const game = GameService.getGame(id);
 
     if (!game) {
-      const err = new Error("Game not found");
-      err.status = 404;
-      throw err;
+      const error = new Error("Game not found");
+      error.status = 404;
+      throw error;
     }
 
     res.json(game);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 });
 
 router.post("/:id/move", attachUser, requireAuth, (req, res, next) => {
   try {
-    const { playerId, input } = req.body;
     const { id } = req.params;
+    const { playerId, input } = req.body;
 
     const game = GameService.submitMove(id, playerId, input);
 
     res.json(game);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 });
 

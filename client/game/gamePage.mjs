@@ -1,8 +1,5 @@
-console.log("Game page loaded");
+import { t, initI18n, getLang } from "../i18n/i18n.mjs";
 
-/*
-  Elements
-*/
 const currentUserEl = document.getElementById("currentUser");
 const turnInfoEl = document.getElementById("turnInfo");
 const playersEl = document.getElementById("players");
@@ -11,32 +8,19 @@ const showSequenceBtn = document.getElementById("showSequenceBtn");
 const statusEl = document.getElementById("status");
 const colorButtons = document.querySelectorAll(".color-btn");
 
-/*
-  Session data
-*/
 const gameId = sessionStorage.getItem("gameId");
 const playerId = sessionStorage.getItem("userId");
 
-/*
-  State
-*/
 let currentGame = null;
 let currentInput = [];
 let cachedNames = {};
-
 let inputLocked = false;
 let showingSequence = false;
-
 let lastShownTurn = null;
 let lastShownLength = -1;
 
-/*
-  Helpers
-*/
 function wait(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function getButtonByColor(color) {
@@ -71,6 +55,14 @@ function clearRoundInput() {
   currentInput = [];
 }
 
+function getTurnLabel(name) {
+  if (getLang() === "nb") {
+    return `${name} ${t("game.turnSuffix")}`;
+  }
+
+  return `${name}${t("game.turnSuffix")}`;
+}
+
 async function getUserName(userId) {
   if (!userId) {
     return "Unknown";
@@ -101,7 +93,7 @@ function updateTurnInfo() {
   }
 
   if (currentGame.status === "waiting") {
-    turnInfoEl.textContent = "Waiting for another player...";
+    turnInfoEl.textContent = t("game.waitingAnotherPlayer");
     return;
   }
 
@@ -111,12 +103,12 @@ function updateTurnInfo() {
   }
 
   if (showingSequence) {
-    turnInfoEl.textContent = "Watch the sequence...";
+    turnInfoEl.textContent = t("game.watchSequence");
     return;
   }
 
   if (currentGame.currentTurn !== playerId) {
-    turnInfoEl.textContent = "Wait for your turn.";
+    turnInfoEl.textContent = t("game.waitTurn");
     return;
   }
 
@@ -124,15 +116,12 @@ function updateTurnInfo() {
   const clicksLeft = clicksNeeded - currentInput.length;
 
   if (clicksLeft > 0) {
-    turnInfoEl.textContent = `Clicks left this round: ${clicksLeft}`;
+    turnInfoEl.textContent = `${t("game.clicksLeft")} ${clicksLeft}`;
   } else {
-    turnInfoEl.textContent = "Checking move...";
+    turnInfoEl.textContent = t("game.checkingMove");
   }
 }
 
-/*
-  Sequence
-*/
 async function showSequence(sequence) {
   hideSequencePrompt();
 
@@ -176,12 +165,9 @@ async function showSequence(sequence) {
   updateTurnInfo();
 }
 
-/*
-  Load game
-*/
 async function loadGame() {
   if (!gameId) {
-    setStatus("No game found.");
+    setStatus(t("game.noGame"));
     turnInfoEl.textContent = "";
     playersEl.textContent = "";
     return;
@@ -190,7 +176,7 @@ async function loadGame() {
   const response = await fetch(`/games/${gameId}`);
 
   if (!response.ok) {
-    setStatus("Game not found or server restarted.");
+    setStatus(t("game.gameMissing"));
     turnInfoEl.textContent = "";
     playersEl.textContent = "";
     clearInterval(gameLoop);
@@ -211,8 +197,8 @@ async function loadGame() {
   const currentTurnName = await getUserName(game.currentTurn);
   const winnerName = await getUserName(game.winnerId);
 
-  currentUserEl.textContent = `Logged in as: ${myName}`;
-  playersEl.textContent = `Players: ${player1Name} vs ${player2Name}`;
+  currentUserEl.textContent = `${t("game.loggedInAs")} ${myName}`;
+  playersEl.textContent = `${t("game.players")} ${player1Name} vs ${player2Name}`;
 
   const turnChanged = previousTurn !== game.currentTurn;
   const sequenceChanged = previousLength !== game.sequence.length;
@@ -224,7 +210,7 @@ async function loadGame() {
   }
 
   if (game.status === "waiting") {
-    setStatus(`Waiting for player 2... (${player1Name} is ready)`);
+    setStatus(t("game.waitingPlayer2"));
     disableButtons();
     hideSequencePrompt();
     updateTurnInfo();
@@ -232,7 +218,7 @@ async function loadGame() {
   }
 
   if (game.status === "finished") {
-    setStatus(`Game finished. Winner: ${winnerName}`);
+    setStatus(`${t("game.finished")} ${winnerName}`);
     disableButtons();
     hideSequencePrompt();
     updateTurnInfo();
@@ -240,9 +226,9 @@ async function loadGame() {
   }
 
   if (game.currentTurn === playerId) {
-    setStatus(`🟢 YOUR TURN | Sequence: ${game.sequence.length}`);
+    setStatus(`🟢 ${t("game.yourTurn")} | ${t("game.sequence")} ${game.sequence.length}`);
   } else {
-    setStatus(`🔴 ${currentTurnName}'s turn | Sequence: ${game.sequence.length}`);
+    setStatus(`🔴 ${getTurnLabel(currentTurnName)} | ${t("game.sequence")} ${game.sequence.length}`);
     disableButtons();
     hideSequencePrompt();
   }
@@ -256,11 +242,8 @@ async function loadGame() {
     inputLocked = true;
     disableButtons();
 
-    if (game.sequence.length === 0) {
-      showSequenceBtn.textContent = "Start round";
-    } else {
-      showSequenceBtn.textContent = "Vis sekvens";
-    }
+    showSequenceBtn.textContent =
+      game.sequence.length === 0 ? t("game.startRound") : t("game.showSequence");
 
     showSequencePrompt();
   } else if (game.currentTurn === playerId && !inputLocked && !showingSequence) {
@@ -270,9 +253,6 @@ async function loadGame() {
   updateTurnInfo();
 }
 
-/*
-  Send move
-*/
 async function sendMove() {
   inputLocked = true;
   disableButtons();
@@ -290,7 +270,7 @@ async function sendMove() {
   });
 
   if (!response.ok) {
-    setStatus("Wrong move or wrong player's turn.");
+    setStatus(t("game.wrongMove"));
     clearRoundInput();
     inputLocked = false;
 
@@ -311,30 +291,23 @@ async function sendMove() {
   loadGame();
 }
 
-/*
-  Click handling
-*/
 function handleColorClick(color) {
-  if (!currentGame) {
-    return;
-  }
-
-  if (inputLocked || showingSequence) {
+  if (!currentGame || inputLocked || showingSequence) {
     return;
   }
 
   if (currentGame.status === "finished") {
-    setStatus("Game finished.");
+    setStatus(t("game.finishedOnly"));
     return;
   }
 
   if (currentGame.status === "waiting") {
-    setStatus("Waiting for player 2...");
+    setStatus(t("game.waitingPlayer2"));
     return;
   }
 
   if (currentGame.currentTurn !== playerId) {
-    setStatus("It is not your turn.");
+    setStatus(t("game.notYourTurn"));
     return;
   }
 
@@ -370,9 +343,6 @@ function handleColorClick(color) {
   }
 }
 
-/*
-  Events
-*/
 showSequenceBtn.addEventListener("click", async () => {
   if (!currentGame) {
     return;
@@ -395,8 +365,7 @@ colorButtons.forEach((button) => {
   });
 });
 
-/*
-  Start
-*/
-loadGame();
-const gameLoop = setInterval(loadGame, 1000);
+initI18n().then(() => {
+  loadGame();
+  setInterval(loadGame, 1000);
+});

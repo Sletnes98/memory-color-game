@@ -5,7 +5,6 @@ export async function api(path, { method = "GET", body } = {}) {
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  // 204 har ingen body
   if (res.status === 204) return { ok: true, status: 204, data: null };
 
   const data = await res.json().catch(() => null);

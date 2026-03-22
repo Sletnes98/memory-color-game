@@ -2,19 +2,19 @@ const GameService = require("./gameService");
 
 try {
   const game = GameService.createGame("user-1");
-  console.log("Created game:");
-  console.log(game);
+  console.log("Created game:", game);
 
   const joinedGame = GameService.joinGame(game.id, "user-2");
-  console.log("Joined game:");
-  console.log(joinedGame);
+  console.log("Joined game:", joinedGame);
 
-  const updatedGame = GameService.submitMove(game.id, "user-1", [
-    joinedGame.sequence[0],
+  const moveInput = [
+    ...(joinedGame.sequence || []),
     "blue"
-  ]);
-  console.log("After move:");
-  console.log(updatedGame);
-} catch (err) {
-  console.error(err.message);
+  ];
+
+  const updatedGame = GameService.submitMove(game.id, "user-1", moveInput);
+  console.log("After move:", updatedGame);
+
+} catch (error) {
+  console.error(error.message);
 }

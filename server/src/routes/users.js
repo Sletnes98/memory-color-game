@@ -1,17 +1,16 @@
 const express = require("express");
-const router = express.Router();
-
 const UserService = require("../services/userService");
+
+const router = express.Router();
 
 function requireConsent(consent) {
   if (!consent?.acceptedTerms || !consent?.acceptedPrivacy) {
-    const err = new Error("Consent to Terms and Privacy Policy is required");
-    err.status = 400;
-    throw err;
+    const error = new Error("Consent to Terms and Privacy Policy is required");
+    error.status = 400;
+    throw error;
   }
 }
 
-// Opprette bruker
 router.post("/", async (req, res) => {
   try {
     const { displayName, consent } = req.body;
@@ -23,50 +22,55 @@ router.post("/", async (req, res) => {
     const user = await UserService.createUser({
       displayName,
       acceptedTermsAt: now,
-      acceptedPrivacyAt: now,
+      acceptedPrivacyAt: now
     });
 
     res.status(201).json(user);
-  } catch (err) {
-    res.status(err.status || 500).json({ error: err.message });
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
   }
 });
 
-// Hente én bruker
 router.get("/:id", async (req, res) => {
   try {
-    const user = await UserService.getUser(req.params.id);
+    const { id } = req.params;
+    const user = await UserService.getUser(id);
 
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
     res.json(user);
-  } catch (err) {
-    res.status(err.status || 500).json({ error: err.message });
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
   }
 });
 
-// Oppdatere bruker
 router.put("/:id", async (req, res) => {
   try {
+    const { id } = req.params;
     const displayName = req.body?.displayName ?? req.body;
 
-    const user = await UserService.updateUser(req.params.id, displayName);
+    const user = await UserService.updateUser(id, displayName);
 
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
     res.json(user);
-  } catch (err) {
-    res.status(err.status || 500).json({ error: err.message });
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
   }
 });
 
-// Slette bruker
 router.delete("/:id", async (req, res) => {
   try {
-    await UserService.deleteUser(req.params.id);
+    const { id } = req.params;
+
+    await UserService.deleteUser(id);
     res.status(204).end();
-  } catch (err) {
-    res.status(err.status || 500).json({ error: err.message });
+  } catch (error) {
+    res.status(error.status || 500).json({ error: error.message });
   }
 });
 

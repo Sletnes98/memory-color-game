@@ -56,7 +56,8 @@ Hvis en spiller trykker feil farge eller feil rekkefølge, avsluttes spillet og 
 - Applikasjonen utvikles som en PWA med grunnleggende offline-støtte
 
 ## Status
-Prosjektet er i oppstartsfasen. Repository inneholder foreløpig dokumentasjon og grunnoppsett.
+Prosjektet er ferdig implementert med frontend, backend og database.
+Applikasjonen støtter to-spillers spill, i18n (flere språk), og er deployet som en PWA.
 
 ## Live Web Service
 
@@ -220,3 +221,37 @@ Dette gjør det enkelt å verifisere at API-et fungerer korrekt.
 Prosjektet bruker en ekstern PostgreSQL-database hostet på Render.
 Opprettelse av bruker (Client → API → DB) resulterer i en ny rad i databasen.
 Data overlever server-restart.
+
+## Bruk av applikasjonen
+
+For å teste spillet må du bruke to nettlesere (eller en vanlig + inkognito).
+
+### Opprette bruker
+- Skriv inn visningsnavn
+- Huk av for vilkår og personvern
+- Klikk **Opprett bruker**
+- Kopier bruker-ID
+
+### Logge inn
+- Lim inn bruker-ID i login-feltet
+- Klikk **Logg inn**
+
+### Lage spill
+- Klikk **Lag spill**
+- Kopier spill-ID
+
+### Bli med i spill
+- Åpne appen i en annen nettleser eller inkognito
+- Opprett eller logg inn med en ny bruker
+- Lim inn spill-ID
+- Klikk **Bli med**
+
+### Spille spillet
+- Klikk **Gå til spill** i begge nettlesere
+- Spillerne bytter på å gjenta sekvensen og legge til én ny farge
+- Hvis en spiller gjør feil, vinner den andre
+
+### Viktig
+- Spillet må testes med to brukere
+- Enklest å bruke to nettlesere eller inkognitomodus
+- Språk velges automatisk basert på nettleserens språk

@@ -17,19 +17,19 @@
     <h1 data-i18n="app.title"></h1>
 
     <section class="card">
-      <h2>Login</h2>
+      <h2 data-i18n="login.title"></h2>
 
       <label>
-        <span>User ID</span>
+        <span data-i18n="login.userId"></span>
         <input
           id="loginUserId"
           type="text"
-          placeholder="Enter your user ID"
+          data-i18n-attr="placeholder:login.placeholder"
         />
       </label>
 
       <div class="row">
-        <button id="loginBtn">Log in</button>
+        <button id="loginBtn" data-i18n="login.button"></button>
       </div>
 
       <p id="loginStatus" role="status" aria-live="polite"></p>
@@ -51,13 +51,23 @@
         <label>
           <input id="terms" type="checkbox" />
           <span data-i18n="user.acceptTerms"></span>
-          <a href="/terms" target="_blank" rel="noopener" data-i18n="link.terms"></a>
+          <a
+            href="/terms"
+            target="_blank"
+            rel="noopener"
+            data-i18n="link.terms"
+          ></a>
         </label>
 
         <label>
           <input id="privacy" type="checkbox" />
           <span data-i18n="user.acceptPrivacy"></span>
-          <a href="/privacy" target="_blank" rel="noopener" data-i18n="link.privacy"></a>
+          <a
+            href="/privacy"
+            target="_blank"
+            rel="noopener"
+            data-i18n="link.privacy"
+          ></a>
         </label>
 
         <div class="row">
@@ -84,27 +94,27 @@
     <user-panel></user-panel>
 
     <section class="card" id="lobbySection" hidden>
-      <h2>Lobby</h2>
+      <h2 data-i18n="lobby.title"></h2>
 
-      <p id="currentUserText">Logged in as:</p>
+      <p id="currentUserText"></p>
 
       <div class="row">
-        <button id="createGameBtn">Create game</button>
+        <button id="createGameBtn" data-i18n="lobby.createGame"></button>
       </div>
 
       <label>
-        <span>Game ID</span>
+        <span data-i18n="lobby.gameId"></span>
         <input
           id="joinGameId"
           type="text"
-          placeholder="Enter game ID"
+          data-i18n-attr="placeholder:lobby.gameIdPlaceholder"
         />
       </label>
 
       <div class="row">
-        <button id="joinGameBtn">Join game</button>
-        <button id="goToGameBtn">Go to game</button>
-        <button id="logoutBtn">Log out</button>
+        <button id="joinGameBtn" data-i18n="lobby.joinGame"></button>
+        <button id="goToGameBtn" data-i18n="lobby.goToGame"></button>
+        <button id="logoutBtn" data-i18n="lobby.logout"></button>
       </div>
 
       <pre id="lobbyStatus" role="status" aria-live="polite"></pre>

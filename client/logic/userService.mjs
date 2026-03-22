@@ -8,9 +8,9 @@ export const UserService = {
         displayName,
         consent: {
           acceptedTerms,
-          acceptedPrivacy,
-        },
-      },
+          acceptedPrivacy
+        }
+      }
     });
   },
 
@@ -18,14 +18,16 @@ export const UserService = {
     return api(`/users/${id}`);
   },
 
-  async deleteUser(id) {
-    return api(`/users/${id}`, { method: "DELETE" });
+  async updateUser(id, displayName) {
+    return api(`/users/${id}`, {
+      method: "PUT",
+      body: { displayName }
+    });
   },
 
-  async updateUser(id, displayName) {
-  return api(`/users/${id}`, {
-    method: "PUT",
-    body: { displayName }
-  });
-}
+  async deleteUser(id) {
+    return api(`/users/${id}`, {
+      method: "DELETE"
+    });
+  }
 };

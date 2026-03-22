@@ -2,34 +2,32 @@ let dict = {};
 let lang = "en";
 
 function detectLang() {
-  const l = (navigator.languages?.[0] || navigator.language || "en").toLowerCase();
-  return l.startsWith("nb") || l.startsWith("no") ? "nb" : "en";
+  const value = (navigator.languages?.[0] || navigator.language || "en").toLowerCase();
+  return value.startsWith("nb") || value.startsWith("no") ? "nb" : "en";
 }
 
 export async function initI18n() {
   lang = detectLang();
 
-  const res = await fetch(`/i18n/${lang}.json`);
-  dict = await res.json();
+  const response = await fetch(`/i18n/${lang}.json`);
+  dict = await response.json();
 
   document.documentElement.lang = lang;
 }
 
 export function t(key) {
-  return dict?.[key] ?? key;
+  return dict[key] ?? key;
 }
 
 export function translatePage(root = document) {
-
-  root.querySelectorAll("[data-i18n]").forEach(el =>
-    el.textContent = t(el.dataset.i18n)
-  );
-
-  root.querySelectorAll("[data-i18n-attr]").forEach(el => {
-    const [attr, key] = el.dataset.i18nAttr.split(":");
-    el.setAttribute(attr, t(key));
+  root.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = t(element.dataset.i18n);
   });
 
+  root.querySelectorAll("[data-i18n-attr]").forEach((element) => {
+    const [attr, key] = element.dataset.i18nAttr.split(":");
+    element.setAttribute(attr, t(key));
+  });
 }
 
 export function getLang() {

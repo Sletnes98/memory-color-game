@@ -1,7 +1,6 @@
 const crypto = require("crypto");
 
 const games = new Map();
-
 const colors = ["red", "green", "blue", "yellow"];
 
 function createGame(player1Id) {
@@ -29,21 +28,21 @@ function joinGame(gameId, player2Id) {
   const game = getGame(gameId);
 
   if (!game) {
-    const err = new Error("Game not found");
-    err.status = 404;
-    throw err;
+    const error = new Error("Game not found");
+    error.status = 404;
+    throw error;
   }
 
   if (game.status !== "waiting") {
-    const err = new Error("Game is not open for joining");
-    err.status = 400;
-    throw err;
+    const error = new Error("Game is not open for joining");
+    error.status = 400;
+    throw error;
   }
 
   if (game.player1Id === player2Id) {
-    const err = new Error("Player 1 and Player 2 cannot be the same user");
-    err.status = 400;
-    throw err;
+    const error = new Error("Player 1 and Player 2 cannot be the same user");
+    error.status = 400;
+    throw error;
   }
 
   game.player2Id = player2Id;
@@ -58,49 +57,49 @@ function submitMove(gameId, playerId, input) {
   const game = getGame(gameId);
 
   if (!game) {
-    const err = new Error("Game not found");
-    err.status = 404;
-    throw err;
+    const error = new Error("Game not found");
+    error.status = 404;
+    throw error;
   }
 
   if (game.status !== "playing") {
-    const err = new Error("Game is not active");
-    err.status = 400;
-    throw err;
+    const error = new Error("Game is not active");
+    error.status = 400;
+    throw error;
   }
 
   if (game.currentTurn !== playerId) {
-    const err = new Error("It is not this player's turn");
-    err.status = 400;
-    throw err;
+    const error = new Error("It is not this player's turn");
+    error.status = 400;
+    throw error;
   }
 
   if (!Array.isArray(input)) {
-    const err = new Error("Input must be an array");
-    err.status = 400;
-    throw err;
+    const error = new Error("Input must be an array");
+    error.status = 400;
+    throw error;
   }
 
   if (input.length !== game.sequence.length + 1) {
-    const err = new Error("Input must repeat the sequence and add one new color");
-    err.status = 400;
-    throw err;
+    const error = new Error("Input must repeat the sequence and add one new color");
+    error.status = 400;
+    throw error;
   }
 
-  for (let i = 0; i < game.sequence.length; i += 1) {
-    if (input[i] !== game.sequence[i]) {
+  for (let index = 0; index < game.sequence.length; index += 1) {
+    if (input[index] !== game.sequence[index]) {
       game.status = "finished";
       game.winnerId = playerId === game.player1Id ? game.player2Id : game.player1Id;
       return game;
     }
   }
 
-  const lastColor = input[input.length - 1];
+  const newColor = input[input.length - 1];
 
-  if (!colors.includes(lastColor)) {
-    const err = new Error("Invalid color");
-    err.status = 400;
-    throw err;
+  if (!colors.includes(newColor)) {
+    const error = new Error("Invalid color");
+    error.status = 400;
+    throw error;
   }
 
   game.sequence = input;

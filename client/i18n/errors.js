@@ -1,5 +1,3 @@
-// server/src/i18n/errors.js
-
 const MESSAGES = {
   en: {
     DISPLAYNAME_REQUIRED: "Display name is required",
@@ -16,7 +14,6 @@ const MESSAGES = {
   }
 };
 
-// Leser språk fra browser header
 function getLang(req) {
   const header = (req.headers["accept-language"] || "").toLowerCase();
 
@@ -27,7 +24,6 @@ function getLang(req) {
   return "en";
 }
 
-// Henter riktig melding
 function msg(req, code) {
   const lang = getLang(req);
   return MESSAGES[lang][code] || MESSAGES[lang].GENERIC;

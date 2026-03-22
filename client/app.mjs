@@ -1,28 +1,6 @@
-import { initI18n, translatePage } from "./i18n/i18n.mjs";
+import { initI18n, translatePage, t } from "./i18n/i18n.mjs";
 import "./ui/userPanel.mjs";
 
-await initI18n();
-translatePage();
-
-console.log("App loaded");
-
-/*
-  Service worker
-*/
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", async () => {
-    try {
-      await navigator.serviceWorker.register("/sw.js");
-      console.log("Service worker registered");
-    } catch (error) {
-      console.error("Service worker registration failed:", error);
-    }
-  });
-}
-
-/*
-  Elements
-*/
 const loginBtn = document.getElementById("loginBtn");
 const loginUserId = document.getElementById("loginUserId");
 const loginStatus = document.getElementById("loginStatus");
@@ -36,9 +14,6 @@ const logoutBtn = document.getElementById("logoutBtn");
 const joinGameId = document.getElementById("joinGameId");
 const lobbyStatus = document.getElementById("lobbyStatus");
 
-/*
-  Session helpers
-*/
 function getUserId() {
   return sessionStorage.getItem("userId");
 }
@@ -60,76 +35,70 @@ function clearSession() {
   sessionStorage.removeItem("gameId");
 }
 
-/*
-  UI helpers
-*/
-function showLobby(userId) {
-  lobbySection.hidden = false;
-  currentUserText.textContent = "Logged in as: " + userId;
-  lobbySection.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function showLoginMessage(message) {
+function setLoginStatus(message) {
   loginStatus.textContent = message;
 }
 
-function showLobbyMessage(message) {
+function setLobbyStatus(message) {
   lobbyStatus.textContent = message;
 }
 
-/*
-  Startup
-*/
-const savedUserId = getUserId();
-
-if (savedUserId) {
-  showLobby(savedUserId);
+function showLobby(userId) {
+  lobbySection.hidden = false;
+  currentUserText.textContent = `${t("lobby.loggedInAs")} ${userId}`;
+  lobbySection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-/*
-  Login
-*/
-loginBtn?.addEventListener("click", async () => {
-  const userId = loginUserId.value.trim();
-
-  if (!userId) {
-    showLoginMessage("Skriv inn en bruker-ID.");
+async function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
     return;
   }
 
-  showLoginMessage("Logger inn...");
+  try {
+    await navigator.serviceWorker.register("/sw.js");
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function handleLogin() {
+  const userId = loginUserId.value.trim();
+
+  if (!userId) {
+    setLoginStatus(t("login.enterUserId"));
+    return;
+  }
+
+  setLoginStatus(t("login.loggingIn"));
 
   try {
     const response = await fetch(`/users/${userId}`);
 
     if (!response.ok) {
-      showLoginMessage("Fant ikke bruker.");
+      setLoginStatus(t("login.userNotFound"));
       return;
     }
 
     const user = await response.json();
 
     saveUserId(user.id);
-    showLoginMessage("Innlogging vellykket.");
+    setLoginStatus(t("login.success"));
     showLobby(user.id);
   } catch (error) {
-    showLoginMessage("Kunne ikke logge inn.");
+    setLoginStatus(t("login.failed"));
     console.error(error);
   }
-});
+}
 
-/*
-  Create game
-*/
-createGameBtn?.addEventListener("click", async () => {
+async function handleCreateGame() {
   const userId = getUserId();
 
   if (!userId) {
-    showLobbyMessage("Du må logge inn først.");
+    setLobbyStatus(t("lobby.loginFirst"));
     return;
   }
 
-  showLobbyMessage("Lager spill...");
+  setLobbyStatus(t("lobby.creatingGame"));
 
   try {
     const response = await fetch("/games", {
@@ -143,7 +112,7 @@ createGameBtn?.addEventListener("click", async () => {
     });
 
     if (!response.ok) {
-      showLobbyMessage("Kunne ikke lage spill.");
+      setLobbyStatus(t("lobby.createGameFailed"));
       return;
     }
 
@@ -151,31 +120,28 @@ createGameBtn?.addEventListener("click", async () => {
 
     saveGameId(game.id);
     joinGameId.value = game.id;
-    showLobbyMessage("Game created: " + game.id);
+    setLobbyStatus(`${t("lobby.gameCreated")} ${game.id}`);
   } catch (error) {
-    showLobbyMessage("Kunne ikke lage spill.");
+    setLobbyStatus(t("lobby.createGameFailed"));
     console.error(error);
   }
-});
+}
 
-/*
-  Join game
-*/
-joinGameBtn?.addEventListener("click", async () => {
+async function handleJoinGame() {
   const userId = getUserId();
   const gameId = joinGameId.value.trim();
 
   if (!userId) {
-    showLobbyMessage("Du må logge inn først.");
+    setLobbyStatus(t("lobby.loginFirst"));
     return;
   }
 
   if (!gameId) {
-    showLobbyMessage("Skriv inn game ID.");
+    setLobbyStatus(t("lobby.enterGameId"));
     return;
   }
 
-  showLobbyMessage("Blir med i spill...");
+  setLobbyStatus(t("lobby.joiningGame"));
 
   try {
     const response = await fetch(`/games/${gameId}/join`, {
@@ -189,38 +155,48 @@ joinGameBtn?.addEventListener("click", async () => {
     });
 
     if (!response.ok) {
-      showLobbyMessage("Kunne ikke bli med i spillet.");
+      setLobbyStatus(t("lobby.joinGameFailed"));
       return;
     }
 
     const game = await response.json();
 
     saveGameId(game.id);
-    showLobbyMessage("Joined game: " + game.id);
+    setLobbyStatus(`${t("lobby.joinedGame")} ${game.id}`);
   } catch (error) {
-    showLobbyMessage("Kunne ikke bli med i spillet.");
+    setLobbyStatus(t("lobby.joinGameFailed"));
     console.error(error);
   }
-});
+}
 
-/*
-  Go to game
-*/
-goToGameBtn?.addEventListener("click", () => {
+function handleGoToGame() {
   const gameId = getGameId();
 
   if (!gameId) {
-    showLobbyMessage("Lag eller join et spill først.");
+    setLobbyStatus(t("lobby.createOrJoinFirst"));
     return;
   }
 
   window.location.href = "/game.html";
-});
+}
 
-/*
-  Log out
-*/
-logoutBtn?.addEventListener("click", () => {
+function handleLogout() {
   clearSession();
   location.reload();
-});
+}
+
+await initI18n();
+translatePage();
+await registerServiceWorker();
+
+const savedUserId = getUserId();
+
+if (savedUserId) {
+  showLobby(savedUserId);
+}
+
+loginBtn?.addEventListener("click", handleLogin);
+createGameBtn?.addEventListener("click", handleCreateGame);
+joinGameBtn?.addEventListener("click", handleJoinGame);
+goToGameBtn?.addEventListener("click", handleGoToGame);
+logoutBtn?.addEventListener("click", handleLogout);
